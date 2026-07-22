@@ -10,10 +10,122 @@
 <link rel="icon" type="image/png" href="../assets/img/RMCH_Icon_Color_web.png">
 <link rel="stylesheet" href="../assets/css/deck.css">
 <style>
-.img-slide{display:none;padding:0;background:#F4F1EA;align-items:center;justify-content:center}
-.img-slide.active{display:flex;flex-direction:column}
-.img-slide .slide-art{display:block;width:100%;height:auto;max-height:calc(100vh - 190px);object-fit:contain;border-radius:14px}
-@media print{.img-slide{display:block;page-break-after:always}.img-slide .slide-art{max-height:none}}
+.sync-wrap{position:relative;display:block;width:100%;max-height:calc(100vh - 190px)}
+.sync-wrap img.slide-art{width:100%;max-height:calc(100vh - 190px)}
+.sync-build .sync-base,.sync-dim .sync-base{transition:opacity .5s ease,filter .5s ease}
+.sync-dim .sync-base{filter:brightness(.5) saturate(.45)}
+.sync-build .sync-base{opacity:.14}
+.sync-r{position:absolute;background-repeat:no-repeat;opacity:0;transition:opacity .45s ease;border-radius:8px;pointer-events:none}
+.sync-r.on{opacity:1}
+.sync-r.pulse{animation:syncPulse 1.5s ease}
+@keyframes syncPulse{0%,100%{box-shadow:0 0 0 0 rgba(29,110,158,0)}35%{box-shadow:0 0 0 6px rgba(29,110,158,.5)}}
+@media (prefers-reduced-motion:reduce){.sync-dim .sync-base,.sync-build .sync-base{filter:none;opacity:1}.sync-r{display:none}.sync-r.pulse{animation:none}}
+</style>
+<style>
+/* ===== native video-style slides ===== */
+.nslide{position:relative;background:#fff;aspect-ratio:16/9;width:min(100%,calc((100vh - 200px)*1.7778));margin-left:auto;margin-right:auto;overflow:hidden;padding:0;container-type:inline-size}
+.nslide .segbar{position:absolute;top:0;left:0;right:0;height:2.6%;display:flex;z-index:6}
+.nslide .segbar .g{background:#8EC152;width:22%}.nslide .segbar .b{background:#348DBC;width:34%}.nslide .segbar .o{background:#EC7006;width:13%}.nslide .segbar .y{background:#F7A803;width:9%}.nslide .segbar .p{background:#B47AB3;width:10%}.nslide .segbar .sp{flex:1}
+.nslide .segbot{position:absolute;bottom:0;right:0;width:46%;height:2.2%;display:flex;z-index:6}
+.nslide .segbot .b{background:#348DBC;width:55%}.nslide .segbot .g{background:#8EC152;width:20%}.nslide .segbot .o{background:#EC7006;width:15%}.nslide .segbot .p{background:#B47AB3;width:10%}
+.nslide .stitle{position:absolute;top:4.6%;left:4.5%;font-family:Montserrat,Arial;font-weight:800;color:#348DBC;font-size:clamp(15px,2.2cqw,27px);margin:0;z-index:6}
+.nslide{--blue:#348DBC;--navy:#073F64;--orange:#EC7006;--green:#8EC152;--purple:#B47AB3;--gold:#F7A803;--ltblue:#65B4E5;--gray:#545454}
+/* timed visibility — full opacity or gone */
+.nslide .tv{opacity:0;visibility:hidden;transition:opacity .5s ease,visibility .5s}
+.nslide .tv.on{opacity:1;visibility:visible}
+.nslide .rise{transform:translateY(12px);transition:opacity .5s ease,transform .5s ease,visibility .5s}
+.nslide .rise.on{transform:none}
+/* scenes */
+.nslide .scene{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2.5%;padding:10.5% 7% 6%}
+.nslide .cap{font-family:Montserrat,Arial;font-weight:700;color:var(--navy);text-align:center;font-size:clamp(15px,2.3cqw,26px);line-height:1.3;max-width:82%}
+.nslide .cap em{color:var(--orange);font-style:normal}
+.nslide svg.illo{width:min(44%,400px);height:auto}
+/* chips + banners + cards */
+.nslide .chiprow{display:flex;gap:1.2%;flex-wrap:wrap;justify-content:center}
+.nslide .chip{background:rgba(52,141,188,.1);border:1.5px solid var(--blue);color:var(--navy);border-radius:99px;padding:.5% 1.6%;font:600 clamp(11px,1.5cqw,17px) Inter,Arial;line-height:1.3}
+.nslide .chip.oc{border-color:var(--orange);background:rgba(236,112,6,.09)}
+.nslide .chip.gc{border-color:var(--green);background:rgba(142,193,82,.12)}
+.nslide .chip.pc{border-color:var(--purple);background:rgba(180,122,179,.12)}
+.nslide .banner{background:rgba(52,141,188,.12);border-left:6px solid var(--blue);border-radius:6px;padding:1.4% 3%;text-align:center;font-family:Montserrat,Arial;font-weight:800;color:var(--navy);font-size:clamp(13px,1.95cqw,22px);line-height:1.35}
+.nslide .quotecard{background:#fff;border:2.5px solid var(--blue);border-radius:12px;padding:2.2% 3%;max-width:78%;box-shadow:0 6px 22px rgba(7,63,100,.12);text-align:center}
+.nslide .quotecard .qt{font-family:Montserrat,Arial;font-weight:700;color:var(--navy);font-size:clamp(15px,2.2cqw,25px);line-height:1.35}
+.nslide .quotecard .qa{color:var(--gray);font:600 clamp(11px,1.4cqw,16px) Inter,Arial;margin-top:8px}
+/* grow groups (cards share full width/height) */
+.nslide .cols{display:flex;min-height:0}
+.nslide .col{flex:1 1 0;padding:.5% 1.4%;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;border-left:1.5px solid #073F6422;transition:flex-grow .6s ease,opacity .5s ease,visibility .5s,padding .6s ease;min-width:0}
+.nslide .col:first-child{border-left:0}
+.nslide .col:not(.on){flex-grow:.001;padding:0;border-left-color:transparent;overflow:hidden}
+.nslide .col svg.ic{width:clamp(30px,4.8cqw,54px);height:auto;margin:2px 0;transition:width .5s ease}
+.nslide .col h3{font-family:Montserrat,Arial;font-weight:700;color:var(--navy);font-size:clamp(12px,1.65cqw,19px);line-height:1.15;margin:1px 0;transition:font-size .5s ease}
+.nslide .col .d{color:var(--gray);font-size:clamp(9.5px,1.25cqw,14px);line-height:1.3;max-width:38ch;transition:font-size .5s ease}
+.nslide .grow-group[data-n="1"] .col svg.ic{width:clamp(64px,10cqw,110px)}
+.nslide .grow-group[data-n="1"] .col h3{font-size:clamp(21px,3cqw,34px)}
+.nslide .grow-group[data-n="1"] .col .d{font-size:clamp(14px,1.85cqw,20px);max-width:46ch}
+.nslide .grow-group[data-n="2"] .col svg.ic{width:clamp(48px,7.5cqw,84px)}
+.nslide .grow-group[data-n="2"] .col h3{font-size:clamp(16px,2.4cqw,27px)}
+.nslide .grow-group[data-n="2"] .col .d{font-size:clamp(12px,1.55cqw,17px)}
+.nslide .grow-group[data-n="3"] .col svg.ic{width:clamp(38px,5.8cqw,66px)}
+.nslide .grow-group[data-n="3"] .col h3{font-size:clamp(13px,1.95cqw,22px)}
+.nslide .grow-group[data-n="3"] .col .d{font-size:clamp(10.5px,1.35cqw,15px)}
+/* vertical grow rows */
+.nslide .rowsv{display:flex;flex-direction:column;min-height:0}
+.nslide .rowv{flex:1 1 0;display:flex;align-items:center;gap:2.5%;padding:.6% 2%;border-top:1.5px solid #073F6422;transition:flex-grow .6s ease,opacity .5s ease,visibility .5s,padding .6s ease;min-height:0}
+.nslide .rowv:first-child{border-top:0}
+.nslide .rowv:not(.on){flex-grow:.001;padding:0;border-top-color:transparent;overflow:hidden}
+.nslide .rowv .myth{flex:0 0 30%;color:var(--gray);font:600 clamp(11px,1.5cqw,17px) Inter,Arial;line-height:1.3}
+.nslide .rowv .myth s{color:#9aa3ab}
+.nslide .rowv .real{flex:1;font-family:Montserrat,Arial;font-weight:800;color:var(--navy);font-size:clamp(14px,2.1cqw,25px);line-height:1.25}
+.nslide .rowv .real em{font-style:normal;color:var(--orange)}
+.nslide .rowv .real .tealx{color:#1FA9A5}
+/* focus strip (defs slide) */
+.nslide .focus{flex:1;position:relative;margin-top:1%}
+.nslide .fpanel{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;gap:3.5%;padding:0 6%}
+.nslide .fpanel svg.illo{width:clamp(66px,12%,120px)}
+.nslide .fpanel .ftxt{font-family:Montserrat,Arial;font-weight:700;color:var(--navy);font-size:clamp(13px,1.9cqw,22px);line-height:1.35;max-width:60ch;text-align:left}
+.nslide .fpanel .ftxt small{display:block;font:500 .72em Inter,Arial;color:var(--gray);margin-top:4px}
+.nslide .fpanel .bignum{font-family:Montserrat,Arial;font-weight:800;color:var(--purple);font-size:clamp(32px,5.6cqw,62px);line-height:1;flex:0 0 auto}
+.nslide .qband{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:0 3%}
+/* stats */
+.nslide .nums{display:flex;align-items:center;gap:4%;width:100%}
+.nslide .num{flex:1;text-align:center}
+.nslide .bignm{font-family:Montserrat,Arial;font-weight:800;font-size:clamp(38px,7.6cqw,88px);line-height:1;letter-spacing:-.02em}
+.nslide .n-b{color:var(--blue)}.nslide .n-o{color:var(--orange)}.nslide .n-g{color:#5a9435}.nslide .n-p{color:var(--purple)}
+.nslide .lbl{color:var(--gray);font-size:clamp(12px,1.6cqw,18px);margin-top:4px}
+.nslide .vr{width:2px;align-self:stretch;background:var(--navy);opacity:.45}
+.nslide .gridwrap{display:flex;align-items:center;gap:3%;margin-top:1%}
+.nslide .gridwrap .gcap{font-family:Montserrat,Arial;font-weight:700;color:var(--navy);font-size:clamp(13px,1.85cqw,20px);line-height:1.35;max-width:44ch;text-align:left}
+.nslide .thesisline{font-family:Montserrat,Arial;font-weight:800;color:var(--navy);text-align:center;font-size:clamp(14px,2.1cqw,23px);border-top:3px solid var(--green);padding-top:1.5%;margin-top:1%;width:78%}
+/* centered theory scenes + fluid graphics */
+.nslide .scene.theory{padding:11.5% 6.5% 6%}
+.nslide .trow{display:flex;align-items:center;justify-content:center;gap:5%;width:100%}
+.nslide .bigcirc{flex:0 0 auto;width:min(33%,310px);aspect-ratio:1;border:5px solid var(--blue);border-radius:50%;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:2.5%;box-shadow:0 8px 26px rgba(7,63,100,.12)}
+.nslide .bigcirc h3{font-family:Montserrat,Arial;font-weight:800;color:var(--navy);font-size:clamp(15px,2.5cqw,29px);margin:0 0 6px;line-height:1.12}
+.nslide .bigcirc .d{color:var(--gray);font-size:clamp(11px,1.45cqw,16px);line-height:1.35;max-width:26ch}
+.nslide .tside{flex:0 1 46%;display:flex;flex-direction:column;gap:10px;position:relative}
+.nslide .tcap{font-family:Montserrat,Arial;font-weight:600;color:var(--navy);font-size:clamp(12px,1.65cqw,19px);line-height:1.4}
+.nslide .tcap small{color:var(--gray);font-weight:500}
+.nslide .fluid{position:absolute;inset:0}
+.nslide .circ{position:absolute;border:3px solid var(--blue);border-radius:50%;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:1.8%}
+.nslide .circ h3{font-family:Montserrat,Arial;font-weight:800;color:var(--navy);font-size:clamp(11px,1.7cqw,20px);margin:0 0 3px;line-height:1.1}
+.nslide .circ .d{font-size:clamp(9px,1.15cqw,13px);color:var(--gray);line-height:1.3}
+.nslide .c-g{border-color:var(--green)}.nslide .c-o{border-color:var(--orange)}.nslide .c-p{border-color:var(--purple)}.nslide .c-y{border-color:var(--gold)}.nslide .c-lb{border-color:var(--ltblue)}
+.nslide .core{background:var(--blue);border:none}
+.nslide .core h3{color:#fff}
+.nslide .callout6{position:absolute;background:#fff;border:2px solid var(--blue);border-radius:8px;padding:.6% 1%;font-size:clamp(8px,1.05cqw,12.5px);line-height:1.3;color:var(--gray);box-shadow:2px 3px 0 rgba(7,63,100,.15);z-index:4}
+.nslide .callout6 b{display:block;color:var(--navy)}
+.nslide svg.arrowsN{position:absolute;inset:0;width:100%;height:100%}
+.nslide .inset{position:absolute;left:2.5%;bottom:5%;width:27%;background:#fff;border:2px solid var(--ltblue);border-radius:10px;padding:1.1% 1.3%;box-shadow:0 4px 14px rgba(7,63,100,.14);z-index:4}
+.nslide .inset .it{font-family:Montserrat,Arial;font-weight:700;color:var(--navy);font-size:clamp(9px,1.15cqw,13.5px);line-height:1.25;margin-top:4px}
+.nslide .inset .it small{color:var(--gray);font-weight:500}
+/* readings + cover extras */
+.nslide .readgrid{display:flex;flex-direction:column;gap:1.4%;width:92%;margin-top:1%}
+.nslide .read{display:flex;align-items:center;gap:2%;background:#fff;border:1.5px solid #073F6426;border-left:6px solid var(--blue);border-radius:8px;padding:1% 2%}
+.nslide .read b{font-family:Montserrat,Arial;color:var(--navy);font-size:clamp(11.5px,1.55cqw,18px)}
+.nslide .read span{color:var(--gray);font-size:clamp(10px,1.3cqw,15px)}
+.nslide .cover-title{font-family:Montserrat,Arial;font-weight:800;color:var(--navy);font-size:clamp(28px,5.2cqw,62px);line-height:1.08;text-align:center;margin:0;letter-spacing:-.01em}
+.nslide .cover-sub{font-family:Montserrat,Arial;font-weight:700;color:var(--blue);font-size:clamp(15px,2.4cqw,28px);text-align:center;line-height:1.3;margin:0}
+.nslide .lockup{max-width:min(34%,320px);height:auto}
+@media (prefers-reduced-motion:reduce){.nslide .tv{transition:none}.nslide .col,.nslide .rowv{transition:none}}
 </style>
 </head>
 <body>
@@ -29,16 +141,73 @@
 </header>
 
 <main class="stage" id="stage" aria-label="Lecture slides: Foundations of Global Migration">
-<section class="slide img-slide cover" id="s1" data-kind="cover" data-audio="audio/module-01/slide-01.mp3">
+<section class="slide nslide cover" id="s1" data-kind="cover" data-audio="audio/module-01/slide-01.mp3">
+<div class="segbar"><i class="g"></i><i class="b"></i><i class="o"></i><i class="y"></i><i class="p"></i><i class="sp"></i></div>
 <h2 class="sr-only">Foundations of Global Migration</h2>
-<img class="slide-art" src="img/module-01/slide-01.jpg" alt="Title slide: Foundations of Global Migration — how do we define, theorize, and contextualize human mobility on a global scale?">
+
+<div class="scene">
+  <img class="lockup" src="../assets/img/RMCH_Primary_Horizontal_Color_web.png" alt="Refugees and Migrants in Our Common Home">
+  <h1 class="cover-title">Foundations of<br>Global Migration</h1>
+  <p class="cover-sub tv rise" data-t="5.6">How do we define, theorize, and contextualize<br>human mobility on a global scale?</p>
+  <div class="chiprow tv rise" data-t="14.6"><span class="chip">A shared vocabulary</span><span class="chip gc">Theoretical tools</span><span class="chip oc tv rise" data-t="19.6">Even the basic categories are contested</span></div>
+  <div class="lbl" style="letter-spacing:.14em;font-weight:600">GLOBAL MIGRATION 101 · FOUNDATIONS</div>
+</div>
+
+
 <aside class="slide-notes print-notes" hidden>
 <h3>Narration transcript</h3><p>Welcome to Global Migration 101. This opening module asks a deceptively simple question: what is migration, and who counts as a migrant? Before we can analyze data, evaluate policy, or explore lived experience, we need a shared vocabulary and a set of theoretical tools. We will find that even the most basic categories are contested — and that acknowledging that contestation is itself a form of intellectual honesty essential to rigorous teaching.</p>
 </aside>
+<div class="segbot"><i class="b"></i><i class="g"></i><i class="o"></i><i class="p"></i></div>
 </section>
-<section class="slide img-slide" id="s2" data-kind="concept" data-audio="audio/module-01/slide-02.mp3">
-<h2 class="sr-only">Migration as a Human Constant</h2>
-<img class="slide-art" src="img/module-01/slide-02.jpg" alt="304 million international migrants in 2024, 3.7 percent of global population. Migration is a historical constant, not an exceptional deviation.">
+<section class="slide nslide" id="s2" data-kind="concept" data-audio="audio/module-01/slide-02.mp3">
+<div class="segbar"><i class="g"></i><i class="b"></i><i class="o"></i><i class="y"></i><i class="p"></i><i class="sp"></i></div>
+<h2 class="stitle">Migration as a Human Constant</h2>
+
+<div class="scene tv" data-t="0" data-tend="17.7">
+  <svg class="illo" viewBox="0 0 420 220" aria-hidden="true">
+    <circle cx="358" cy="46" r="24" fill="#F7A803"/>
+    <path d="M10 186 H410" stroke="#8EC152" stroke-width="6" stroke-linecap="round"/>
+    <g><circle cx="130" cy="106" r="14" fill="#348DBC"/><rect x="116" y="124" width="28" height="50" rx="12" fill="#348DBC"/><rect x="148" y="150" width="22" height="26" rx="4" fill="#073F64"/><rect x="155" y="143" width="8" height="8" rx="3" fill="#073F64"/></g>
+    <g><circle cx="212" cy="98" r="16" fill="#EC7006"/><rect x="196" y="118" width="32" height="56" rx="13" fill="#EC7006"/></g>
+    <g><circle cx="278" cy="110" r="12" fill="#B47AB3"/><rect x="266" y="125" width="24" height="46" rx="10" fill="#B47AB3"/><circle cx="308" cy="132" r="9" fill="#8EC152"/><rect x="300" y="143" width="17" height="30" rx="7" fill="#8EC152"/></g>
+  </svg>
+  <div class="cap">Movement in search of <em>safety</em>, <em>opportunity</em>, and <em>connection</em> — one of the most fundamental human behaviors.</div>
+</div>
+<div class="scene tv" data-t="17.7" data-tend="27.8">
+  <svg class="illo" viewBox="0 0 420 220" aria-hidden="true">
+    <rect x="30" y="40" width="150" height="150" rx="8" fill="none" stroke="#073F64" stroke-width="5"/>
+    <path d="M55 40 V190 M80 40 V190 M105 40 V190 M130 40 V190 M155 40 V190" stroke="#073F64" stroke-width="4"/>
+    <rect x="230" y="55" width="150" height="110" rx="8" fill="#fff" stroke="#348DBC" stroke-width="5"/>
+    <rect x="248" y="75" width="60" height="10" rx="5" fill="#65B4E5"/>
+    <rect x="248" y="95" width="90" height="8" rx="4" fill="#c9dff0"/>
+    <rect x="248" y="111" width="90" height="8" rx="4" fill="#c9dff0"/>
+    <g transform="rotate(-14 330 140)"><circle cx="330" cy="140" r="26" fill="none" stroke="#EC7006" stroke-width="5"/><path d="M312 140 H348 M330 122 V158" stroke="#EC7006" stroke-width="4"/></g>
+  </svg>
+  <div class="cap">The <em>"crisis" framing</em> is historically recent — born with nation-states, when crossing a boundary began to require <em>permission</em>.</div>
+</div>
+<div class="scene tv" data-t="27.8" data-tend="49.7">
+  <svg class="illo" viewBox="0 0 420 190" aria-hidden="true" style="width:min(32%,290px)">
+    <circle cx="210" cy="95" r="72" fill="none" stroke="#348DBC" stroke-width="6"/>
+    <path d="M138 95 h144 M210 23 c-30 34 -30 110 0 144 M210 23 c30 34 30 110 0 144" stroke="#348DBC" stroke-width="4" fill="none"/>
+    <path d="M60 160 C 130 120 290 120 360 160" stroke="#8EC152" stroke-width="6" fill="none" stroke-linecap="round"/>
+    <path d="M348 152 l16 6 -10 12" fill="none" stroke="#8EC152" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>
+  <div class="cap" style="font-size:clamp(19px,3cqw,33px)">Migration is a <em>historical constant</em>,<br>not an exceptional deviation.</div>
+</div>
+<div class="scene tv" data-t="49.7" style="justify-content:flex-start;padding-top:11.5%">
+  <div class="nums">
+    <div class="num"><div class="bignm n-b" data-count="304" data-suffix="M" data-start="49.7">304M</div><div class="lbl">International Migrants in 2024 <span style="color:#9aa3ab">· UN DESA</span></div></div>
+    <div class="vr"></div>
+    <div class="num tv rise" data-t="59.4"><div class="bignm n-o" data-count="3.7" data-suffix="%" data-dec="1" data-start="59.4">3.7%</div><div class="lbl">of Global Population</div></div>
+  </div>
+  <div class="gridwrap tv rise" data-t="63.0">
+    <svg viewBox="0 0 210 90" aria-hidden="true" style="width:min(38%,320px)"><g class="pgrid"></g></svg>
+    <div class="gcap">More than <b style="color:var(--orange)">96 of every 100 people</b> on Earth did <u>not</u> migrate internationally.</div>
+  </div>
+  <div class="thesisline tv rise" data-t="71.6">Migration is a historical constant, not an exceptional deviation.</div>
+</div>
+
+
 <aside class="slide-notes print-notes" hidden>
 <h3>Full slide detail</h3><ul>
 <li>Human beings have been mobile for the entirety of recorded — and pre-recorded — history; the modern framing of migration as a &#x27;problem&#x27; to be managed is a historically recent construction tied to the rise of the nation-state.</li>
@@ -49,10 +218,63 @@
 <h3>Instructor notes</h3><p>Open with this slide to immediately challenge the assumption that migration is inherently exceptional or crisis-driven. Ask students: &#x27;What image came to mind when you heard the word migrant before this course?&#x27; Surface assumptions before introducing definitions. Castles (2017) is the reading anchor here.</p>
 <h3>Narration transcript</h3><p>When we talk about migration, we are talking about one of the most fundamental human behaviors — the movement from one place to another in search of safety, opportunity, connection, or simply a different life. And yet, in contemporary political discourse, migration is frequently framed as a crisis, a wave, an invasion, or an emergency. This framing is historically unusual. It emerged alongside the consolidation of nation-states in the nineteenth and twentieth centuries — the moment when territory became legally bounded and crossing those boundaries became an act requiring permission. According to UN DESA, roughly 304 million people lived outside their country of birth in 2024. That sounds like a large number. But it represents only 3.7 percent of the global population. The overwhelming majority of humanity — more than 96 percent — did not migrate internationally. This is the first important reality check we need to hold onto throughout this course.</p>
 </aside>
+<div class="segbot"><i class="b"></i><i class="g"></i><i class="o"></i><i class="p"></i></div>
 </section>
-<section class="slide img-slide" id="s3" data-kind="definition" data-audio="audio/module-01/slide-03.mp3">
-<h2 class="sr-only">Core Definitions: Migration, Refugee, Asylum Seeker, IDP</h2>
-<img class="slide-art" src="img/module-01/slide-03.jpg" alt="Five definition cards — international migrant, refugee, asylum seeker, IDP (internally displaced), stateless — with the question: does a 75-year-old legal definition capture who needs protection today?">
+<section class="slide nslide" id="s3" data-kind="definition" data-audio="audio/module-01/slide-03.mp3">
+<div class="segbar"><i class="g"></i><i class="b"></i><i class="o"></i><i class="y"></i><i class="p"></i><i class="sp"></i></div>
+<h2 class="stitle">Core Definitions</h2>
+
+<div style="position:absolute;inset:0;display:flex;flex-direction:column;padding:10.5% 2.5% 5%">
+  <div class="cols grow-group" style="flex:0 0 52%">
+    <div class="col tv rise" data-t="0">
+      <svg class="ic" viewBox="0 0 64 64" fill="none" stroke="#348DBC" stroke-width="3.4"><circle cx="32" cy="32" r="17"/><path d="M15 32h34M32 15c-7 8-7 26 0 34M32 15c7 8 7 26 0 34"/><path d="M49 14l7-3-2 8M15 50l-7 3 2-8" stroke-linecap="round"/></svg>
+      <h3>International Migrant</h3><div class="d">Outside birth country for 1+ year (UN DESA).</div>
+    </div>
+    <div class="col tv rise" data-t="24.3">
+      <svg class="ic" viewBox="0 0 64 64" fill="none" stroke="#8EC152" stroke-width="3.4"><path d="M32 6l22 8v16c0 14-9 24-22 28C19 54 10 44 10 30V14z"/><path d="M32 22v16M24 30h16" stroke-linecap="round"/></svg>
+      <h3>Refugee</h3><div class="d">Outside country + well-founded fear of persecution (1951 Convention).</div>
+    </div>
+    <div class="col tv rise" data-t="49.4">
+      <svg class="ic" viewBox="0 0 64 64" fill="none" stroke="#EC7006" stroke-width="3.4"><rect x="12" y="6" width="32" height="44" rx="3"/><path d="M20 18h16M20 26h16M20 34h8"/><circle cx="41" cy="41" r="10"/><path d="M48 48l8 8" stroke-linecap="round"/></svg>
+      <h3>Asylum Seeker</h3><div class="d">Applied for refugee status + awaiting determination.</div>
+    </div>
+    <div class="col tv rise" data-t="55.8">
+      <svg class="ic" viewBox="0 0 64 64" fill="none" stroke="#B47AB3" stroke-width="3.4"><path d="M10 30L32 12l22 18M16 26v26h32V26"/><path d="M40 34l-9 9m0-7v7h7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <h3>IDP (Internally Displaced)</h3><div class="d">Forced to flee + remains within national borders.</div>
+    </div>
+    <div class="col tv rise" data-t="71.0">
+      <svg class="ic" viewBox="0 0 64 64" fill="none" stroke="#F7A803" stroke-width="3.4"><rect x="6" y="14" width="52" height="36" rx="4"/><circle cx="21" cy="30" r="6"/><path d="M13 44c2-5 5-7 8-7s6 2 8 7M38 24h14M38 32h14M38 40h9"/></svg>
+      <h3>Stateless</h3><div class="d">Lacking nationality under any state law.</div>
+    </div>
+  </div>
+  <div class="focus">
+    <div class="fpanel tv" data-t="0" data-tend="6.0">
+      <svg class="illo" viewBox="0 0 120 90" aria-hidden="true"><path d="M60 18 C 45 8 22 8 10 14 V74 C 22 68 45 68 60 78 C 75 68 98 68 110 74 V14 C 98 8 75 8 60 18z" fill="#fff" stroke="#348DBC" stroke-width="4"/><path d="M60 18 V78" stroke="#348DBC" stroke-width="3"/><path d="M20 28h28M20 40h28M20 52h20M72 28h28M72 40h28M72 52h20" stroke="#65B4E5" stroke-width="4" stroke-linecap="round"/></svg>
+      <div class="ftxt">Five terms. Five different legal fates.<small>The vocabulary that decides who is protected — and who is not.</small></div>
+    </div>
+    <div class="fpanel tv" data-t="6.0" data-tend="24.3">
+      <svg class="illo" viewBox="0 0 120 90" aria-hidden="true"><rect x="14" y="10" width="92" height="70" rx="8" fill="#fff" stroke="#348DBC" stroke-width="4"/><path d="M28 30h20M28 45h20M28 60h20" stroke="#65B4E5" stroke-width="5" stroke-linecap="round"/><path d="M62 26 l8 8 14 -16" stroke="#8EC152" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M62 46 l8 8 14 -16" stroke="#8EC152" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M62 66 l8 8 14 -16" stroke="#8EC152" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <div class="ftxt">"International migrant" is a <b>counting category</b>.<small>It says nothing about why someone moved, how they traveled, or what rights they hold.</small></div>
+    </div>
+    <div class="fpanel tv" data-t="24.3" data-tend="49.4">
+      <svg class="illo" viewBox="0 0 120 90" aria-hidden="true"><rect x="24" y="6" width="72" height="78" rx="6" fill="#fff" stroke="#8EC152" stroke-width="4"/><path d="M36 22h48M36 34h48M36 46h32" stroke="#c8dfb0" stroke-width="5" stroke-linecap="round"/><circle cx="76" cy="64" r="12" fill="none" stroke="#EC7006" stroke-width="4"/><path d="M70 64l4 4 8-9" stroke="#EC7006" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/><text x="34" y="72" font-family="Montserrat,Arial" font-weight="800" font-size="14" fill="#073F64">1951</text></svg>
+      <div class="ftxt">The <b>1951 Refugee Convention</b>: a well-founded fear of persecution.<small>Race · religion · nationality · political opinion · membership of a particular social group.</small></div>
+    </div>
+    <div class="fpanel tv" data-t="49.4" data-tend="55.8">
+      <svg class="illo" viewBox="0 0 120 90" aria-hidden="true"><path d="M40 12 h40 M40 78 h40 M44 12 c0 22 32 22 32 33 c0 11 -32 11 -32 33 M76 12 c0 22 -32 22 -32 33 c0 11 32 11 32 33" fill="none" stroke="#EC7006" stroke-width="4" stroke-linecap="round"/><path d="M52 30 h16 l-8 10z" fill="#F7A803"/></svg>
+      <div class="ftxt">An asylum seeker has made that claim —<small>and is waiting for a state to decide it.</small></div>
+    </div>
+    <div class="fpanel tv" data-t="55.8" data-tend="71.0">
+      <div class="bignum" data-count="73.5" data-suffix="M" data-dec="1" data-start="69.9">73.5M</div>
+      <div class="ftxt">internally displaced people at the end of 2024 (UNHCR) — the <b>largest</b> group of the forcibly displaced.<small>Never crossed a border — so the 1951 Convention does not cover them.</small></div>
+    </div>
+    <div class="qband tv" data-t="71.0">
+      <div class="banner">The Question: Does a 75-year-old legal definition capture who needs protection today?</div>
+    </div>
+  </div>
+</div>
+
+
 <aside class="slide-notes print-notes" hidden>
 <h3>Full slide detail</h3><ul>
 <li>International migrant (UN DESA): a person residing in a country other than their country of birth for at least one year, regardless of legal status or reason — an administrative and statistical definition that deliberately brackets cause.</li>
@@ -63,11 +285,50 @@
 </ul>
 <h3>Instructor notes</h3><p>Students often conflate refugee and migrant in casual speech. This slide is an opportunity to explain that in international law these are distinct legal categories with very different rights and obligations attached. Graduate students should be pushed to consider how Tazzioli and Scheel (2022) argue that the very act of categorization is political and embeds methodological nationalism.</p>
 <h3>Narration transcript</h3><p>Let us establish the core vocabulary. The broadest term is &#x27;international migrant,&#x27; a statistical category used by UN DESA to mean simply: someone living outside their country of birth. It does not tell us why they moved, how they got there, or what rights they hold. It is a counting category. Within that broad universe, we distinguish those who are forcibly displaced. The 1951 Refugee Convention defines a refugee as someone outside their country of nationality who cannot return due to a well-founded fear of persecution on specific grounds — race, religion, nationality, political opinion, or membership in a particular social group. An asylum seeker is someone who has made that claim and is awaiting determination. But the largest category of forced displacement is actually IDPs — internally displaced persons — people who fled but never crossed an international border. At the end of 2024, UNHCR counted 73.5 million IDPs. They are not covered by the 1951 Convention. That gap is one of the most consequential structural failings in international protection, and we will return to it repeatedly in this course.</p>
+<h3>Pending narration addition — statelessness (not yet recorded)</h3><p>Insert after "…73.5 million IDPs. They are not covered by the 1951 Convention." — <em>"And one category sits outside every border crossing: statelessness. A stateless person is someone no state recognizes as a national under the operation of its law. UNHCR counts at least 4.4 million stateless people worldwide — and regards that figure as a significant undercount. Without a nationality, the most ordinary rights — registering a birth, enrolling in school, seeing a doctor, working legally — can be out of reach."</em></p><p>Then change the closing line "That gap is one of the most consequential structural failings…" to "These gaps are among the most consequential structural failings…" so it covers both the IDP gap and statelessness.</p>
 </aside>
+<div class="segbot"><i class="b"></i><i class="g"></i><i class="o"></i><i class="p"></i></div>
 </section>
-<section class="slide img-slide" id="s4" data-kind="concept" data-audio="audio/module-01/slide-04.mp3">
-<h2 class="sr-only">The Voluntary–Forced Continuum</h2>
-<img class="slide-art" src="img/module-01/slide-04.jpg" alt="The voluntary–forced continuum from economic pull to survival push, with Carling&#x27;s aspiration/ability framework and the analytical gap. Legal thresholds force this complex continuum into a rigid refugee/not-refugee binary.">
+<section class="slide nslide" id="s4" data-kind="concept" data-audio="audio/module-01/slide-04.mp3">
+<div class="segbar"><i class="g"></i><i class="b"></i><i class="o"></i><i class="y"></i><i class="p"></i><i class="sp"></i></div>
+<h2 class="stitle">The Voluntary–Forced Continuum</h2>
+
+<div class="scene tv" data-t="0" data-tend="13.5">
+  <svg class="illo" viewBox="0 0 420 150" aria-hidden="true">
+    <rect x="20" y="35" width="160" height="80" rx="10" fill="none" stroke="#8EC152" stroke-width="5"/>
+    <text x="100" y="70" text-anchor="middle" font-family="Montserrat,Arial" font-weight="800" font-size="19" fill="#073F64">MIGRANTS</text>
+    <text x="100" y="95" text-anchor="middle" font-family="Inter,Arial" font-size="13" fill="#545454">"choose to move"</text>
+    <rect x="240" y="35" width="160" height="80" rx="10" fill="none" stroke="#EC7006" stroke-width="5"/>
+    <text x="320" y="70" text-anchor="middle" font-family="Montserrat,Arial" font-weight="800" font-size="19" fill="#073F64">REFUGEES</text>
+    <text x="320" y="95" text-anchor="middle" font-family="Inter,Arial" font-size="13" fill="#545454">"compelled to move"</text>
+    <text x="210" y="83" text-anchor="middle" font-family="Montserrat,Arial" font-weight="800" font-size="30" fill="#B47AB3">?</text>
+  </svg>
+  <div class="cap">We speak as if migrants <em>choose</em> and refugees are <em>compelled</em>. In practice, the line is far murkier.</div>
+</div>
+<div class="scene tv" data-t="13.5" data-tend="30.4">
+  <svg class="illo" viewBox="-55 0 570 120" aria-hidden="true" style="width:min(66%,600px)">
+    <defs><linearGradient id="vf4" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#8EC152"/><stop offset="1" stop-color="#EC7006"/></linearGradient></defs>
+    <rect x="20" y="52" width="420" height="16" rx="8" fill="url(#vf4)"/>
+    <circle cx="30" cy="60" r="14" fill="#8EC152"/><circle cx="430" cy="60" r="14" fill="#EC7006"/>
+    <text x="30" y="100" text-anchor="middle" font-family="Montserrat,Arial" font-weight="800" font-size="15" fill="#073F64">VOLUNTARY</text>
+    <text x="430" y="100" text-anchor="middle" font-family="Montserrat,Arial" font-weight="800" font-size="15" fill="#073F64">FORCED</text>
+    <path d="M230 30 v60" stroke="#B47AB3" stroke-width="4" stroke-dasharray="6 6"/>
+    <text x="230" y="20" text-anchor="middle" font-family="Inter,Arial" font-weight="600" font-size="13" fill="#B47AB3">most journeys live here</text>
+  </svg>
+  <div class="cap tv" data-t="15.2" data-tend="30.4" style="font-size:clamp(13px,1.9cqw,21px)">Fleeing extreme poverty under structural violence may not meet the refugee definition — but calling it <em>"voluntary"</em> misrepresents the constraint.</div>
+</div>
+<div class="scene tv" data-t="30.4" style="padding-top:12%">
+  <div class="cap" style="font-size:clamp(13px,1.9cqw,21px);margin-bottom:.6%">Carling (2002): <em>aspiration</em> × <em>ability</em></div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.6%;width:78%;flex:0 0 56%">
+    <div class="tv rise banner" data-t="42.6" style="border-left-color:var(--green);background:rgba(142,193,82,.12);display:flex;align-items:center;justify-content:center">Aspire + able → <b>&nbsp;migration</b></div>
+    <div class="tv rise banner" data-t="45.5" data-hot="49.8~57.9" style="border-left-color:var(--orange);background:rgba(236,112,6,.1);display:flex;flex-direction:column;align-items:center;justify-content:center"><b>Aspire but unable</b><span style="font-weight:600;font-size:.85em">→ "involuntary immobility"</span></div>
+    <div class="tv rise banner" data-t="51.4" style="border-left-color:var(--blue);display:flex;align-items:center;justify-content:center">Able but content → <b>&nbsp;staying</b></div>
+    <div class="tv rise banner" data-t="55.4" style="border-left-color:var(--purple);background:rgba(180,122,179,.1);display:flex;align-items:center;justify-content:center">…and everyone <b>&nbsp;in between</b></div>
+  </div>
+  <div class="banner tv rise" data-t="57.9" style="width:86%">Involuntary immobility is real — with documented mental-health consequences. Teaching it makes migration teaching humane <i>and</i> rigorous.</div>
+</div>
+
+
 <aside class="slide-notes print-notes" hidden>
 <h3>Full slide detail</h3><ul>
 <li>The binary distinction between &#x27;voluntary&#x27; economic migrants and &#x27;forced&#x27; refugees is analytically and empirically unstable; most migration decisions involve a mixture of coercion, constraint, aspiration, and structural pressure.</li>
@@ -78,10 +339,49 @@
 <h3>Instructor notes</h3><p>This slide tends to generate strong student reactions because it complicates intuitive categories. A productive discussion prompt: &#x27;If a person leaves because their region has experienced both drought and gang violence, are they an economic migrant or a forced migrant?&#x27; There is no clean answer — and that is the pedagogical point. Draw attention to how the legal binary has real protective consequences.</p>
 <h3>Narration transcript</h3><p>One of the most important conceptual moves in migration studies is to question the voluntary-forced binary. We often speak as if migrants choose to move while refugees are compelled to. In practice, the line is far murkier. Someone fleeing extreme poverty in a context of structural violence may not meet the legal definition of a refugee, but describing their departure as &#x27;voluntary&#x27; misrepresents the degree of constraint they face. Jørgen Carling introduced the aspiration-ability framework in a landmark 2002 article, distinguishing between wanting to move and being able to move. This gives us four categories: those who aspire to migrate and can; those who aspire to migrate but cannot — what he calls &#x27;involuntary immobility&#x27;; those who can migrate but do not wish to; and those caught somewhere in between. Recognizing involuntary immobility as a real condition — with documented mental health consequences — is important for faculty who want to teach migration humanely and rigorously.</p>
 </aside>
+<div class="segbot"><i class="b"></i><i class="g"></i><i class="o"></i><i class="p"></i></div>
 </section>
-<section class="slide img-slide" id="s5" data-kind="framework" data-audio="audio/module-01/slide-05.mp3">
-<h2 class="sr-only">Theoretical Landscape I: Classical Frameworks</h2>
-<img class="slide-art" src="img/module-01/slide-05.jpg" alt="The Massey synthesis (1993): each theory captures a different scale of the same reality — neoclassical economics (individual), new economics of labor migration (household), dual labor market (structural), world systems (global).">
+<section class="slide nslide" id="s5" data-kind="framework" data-audio="audio/module-01/slide-05.mp3">
+<div class="segbar"><i class="g"></i><i class="b"></i><i class="o"></i><i class="y"></i><i class="p"></i><i class="sp"></i></div>
+<h2 class="stitle">The Theoretical Landscape: Four Scales</h2>
+
+<div style="position:absolute;inset:0;display:flex;flex-direction:column;padding:10.5% 2.5% 5%">
+  <div class="scene tv" data-t="0" data-tend="11.2" style="position:absolute;inset:0;background:#fff;z-index:3;padding:6% 7% 9.5%">
+    <svg class="illo" viewBox="0 16 420 144" aria-hidden="true">
+      <g fill="none" stroke-width="5">
+        <circle cx="70" cy="80" r="18" stroke="#348DBC"/>
+        <circle cx="170" cy="80" r="30" stroke="#8EC152"/>
+        <circle cx="285" cy="80" r="42" stroke="#EC7006"/>
+        <circle cx="285" cy="80" r="58" stroke="#B47AB3" opacity=".85"/>
+      </g>
+      <text x="70" y="130" text-anchor="middle" font-family="Inter,Arial" font-weight="600" font-size="12" fill="#545454">person</text>
+      <text x="170" y="130" text-anchor="middle" font-family="Inter,Arial" font-weight="600" font-size="12" fill="#545454">household</text>
+      <text x="285" y="152" text-anchor="middle" font-family="Inter,Arial" font-weight="600" font-size="12" fill="#545454">economy · world</text>
+    </svg>
+    <div class="cap">Each framework starts from different assumptions — and answers at a <em>different scale</em>.</div>
+  </div>
+  <div class="cols grow-group" style="flex:1 1 auto">
+    <div class="col tv rise" data-t="11.2">
+      <svg class="ic" viewBox="0 0 64 64" fill="none" stroke="#348DBC" stroke-width="3.4"><circle cx="32" cy="20" r="9"/><path d="M18 52c2-11 8-16 14-16s12 5 14 16"/><path d="M45 22l8-6M45 30l10-2" stroke-linecap="round"/></svg>
+      <h3>Neoclassical<br>· individual ·</h3><div class="d">Expected wages there vs. here, minus the cost of moving (Ravenstein; Todaro).</div>
+    </div>
+    <div class="col tv rise" data-t="22.0">
+      <svg class="ic" viewBox="0 0 64 64" fill="none" stroke="#8EC152" stroke-width="3.4"><path d="M10 30L32 14l22 16M16 27v25h32V27"/><path d="M26 52v-12h12v12M32 8v4" stroke-linecap="round"/></svg>
+      <h3>New Economics<br>· household ·</h3><div class="d">Families send migrants to diversify income and manage risk — insurance, not just wages (Stark &amp; Bloom).</div>
+    </div>
+    <div class="col tv rise" data-t="31.4">
+      <svg class="ic" viewBox="0 0 64 64" fill="none" stroke="#EC7006" stroke-width="3.4"><rect x="8" y="26" width="20" height="28" rx="3"/><rect x="36" y="14" width="20" height="40" rx="3"/><path d="M13 34h10M13 42h10M41 22h10M41 30h10M41 38h10" stroke-linecap="round"/></svg>
+      <h3>Dual Labor Market<br>· structural ·</h3><div class="d">Advanced economies structurally demand migrant labor for the jobs native workers reject (Piore).</div>
+    </div>
+    <div class="col tv rise" data-t="49.3">
+      <svg class="ic" viewBox="0 0 64 64" fill="none" stroke="#B47AB3" stroke-width="3.4"><circle cx="32" cy="32" r="22"/><path d="M10 32h44M32 10c-9 10-9 34 0 44M32 10c9 10 9 34 0 44"/><path d="M18 18l28 28M46 18L18 46" stroke-linecap="round" opacity=".7"/></svg>
+      <h3>World Systems<br>· global ·</h3><div class="d">Capital's reach — colonial ties, trade, military presence — carves the channels migration then follows (Wallerstein; Sassen).</div>
+    </div>
+  </div>
+  <div class="banner tv rise" data-t="64.5" style="margin-top:1.2%">Massey et al. (1993): none is sufficient alone — each illuminates a different scale. <b>Hold them in productive tension.</b></div>
+</div>
+
+
 <aside class="slide-notes print-notes" hidden>
 <h3>Full slide detail</h3><ul>
 <li>Neoclassical economics (Ravenstein, 1885; Todaro &amp; Harris, 1970): migration as rational individual response to wage differentials between regions; predicts migrants move from low-wage to high-wage areas and stop when differentials equalize.</li>
@@ -93,10 +393,85 @@
 <h3>Instructor notes</h3><p>For undergraduate students, focus on neoclassical and new economics — they are intuitive entry points. For graduate students, push toward Massey et al.&#x27;s synthetic critique: each theory tells part of the story, but none is complete. A useful board exercise is to take a single real migration flow (e.g., Filipino nurses to the UK) and ask: which theories best explain it? How do they complement or contradict each other?</p>
 <h3>Narration transcript</h3><p>Migration scholars have developed a rich set of theoretical frameworks, each starting from different assumptions about human behavior and social structure. The oldest and most intuitive is neoclassical economics: people move when expected wages elsewhere exceed wages at home, accounting for the costs of moving. A more sophisticated variant — the New Economics of Labor Migration — shifts the unit of analysis to the household, recognizing that families send migrants abroad partly as an insurance strategy. Michael Piore argued from a different angle entirely: it is not just that migrants want to leave their countries, but that advanced economies structurally demand them. A second, informal labor market for low-wage work that native workers reject creates permanent pull. And world systems theorists like Saskia Sassen show how the global reach of capital generates migration flows along the same channels — colonial relationships, trade networks, military presence — through which capital itself has penetrated. As Massey and colleagues showed in their 1993 synthesis, none of these frameworks is sufficient on its own. They illuminate different scales and mechanisms. The best teaching approach holds them in productive tension.</p>
 </aside>
+<div class="segbot"><i class="b"></i><i class="g"></i><i class="o"></i><i class="p"></i></div>
 </section>
-<section class="slide img-slide" id="s6" data-kind="framework" data-audio="audio/module-01/slide-06.mp3">
-<h2 class="sr-only">Theoretical Landscape II: Beyond Classical Models</h2>
-<img class="slide-art" src="img/module-01/slide-06.jpg" alt="Modern synthesis diagram connecting network theory, cumulative causation, and transnationalism around a shared core.">
+<section class="slide nslide" id="s6" data-kind="framework" data-audio="audio/module-01/slide-06.mp3">
+<div class="segbar"><i class="g"></i><i class="b"></i><i class="o"></i><i class="y"></i><i class="p"></i><i class="sp"></i></div>
+<h2 class="stitle">Beyond Classical Models: The Modern Synthesis</h2>
+
+<div class="scene tv" data-t="0" data-tend="11.6">
+  <svg class="illo" viewBox="0 0 420 170" aria-hidden="true">
+    <g fill="none" stroke="#8EC152" stroke-width="5"><rect x="30" y="60" width="26" height="70" rx="4"/><rect x="64" y="35" width="26" height="95" rx="4"/><rect x="98" y="80" width="26" height="50" rx="4"/></g>
+    <g fill="none" stroke="#EC7006" stroke-width="5"><circle cx="210" cy="82" r="40"/><path d="M210 54v28l20 12"/></g>
+    <g fill="none" stroke="#B47AB3" stroke-width="5"><circle cx="330" cy="60" r="17"/><circle cx="385" cy="95" r="17"/><circle cx="318" cy="120" r="17"/><path d="M344 70 371 86 M330 112 336 78 M334 116 369 100"/></g>
+  </svg>
+  <div class="cap">Beyond wages and markets: <em>social structure</em>, <em>historical accumulation</em>, and lives lived <em>across borders at once</em>.</div>
+</div>
+<div class="scene tv theory" data-t="11.6" data-tend="43.0">
+  <div class="trow">
+    <div class="bigcirc" style="border-color:var(--green)"><h3>Network Theory</h3><div class="d">Established networks lower the costs and risks for the migrants who follow.</div></div>
+    <div class="tside">
+      <svg viewBox="0 0 300 120" aria-hidden="true" style="width:min(100%,300px)">
+        <circle cx="24" cy="92" r="8" fill="#8EC152"/><circle cx="276" cy="42" r="8" fill="#8EC152"/>
+        <path d="M24 92 C 100 20 200 18 276 42" stroke="#8EC152" stroke-width="5" fill="none" stroke-linecap="round"/>
+        <circle cx="24" cy="104" r="8" fill="#65B4E5"/><circle cx="276" cy="88" r="8" fill="#65B4E5"/>
+        <path d="M24 104 C 110 62 205 70 276 88" stroke="#65B4E5" stroke-width="5" fill="none" stroke-linecap="round"/>
+        <g fill="#073F64"><circle cx="120" cy="55" r="4"/><circle cx="150" cy="50" r="4"/><circle cx="180" cy="49" r="4"/></g>
+      </svg>
+      <div class="tcap tv" data-t="33.1" data-tend="43.0"><b>Corridors persist for decades</b><br><small>Michoacán → Chicago &nbsp;·&nbsp; Sylhet → Bradford</small></div>
+      <div class="tcap tv" data-t="11.6" data-tend="33.1">Family and community ties make each journey <b>cheaper and safer</b> than the one before — migration is <b>path-dependent</b>.</div>
+    </div>
+  </div>
+</div>
+<div class="scene tv theory" data-t="43.0" data-tend="57.3">
+  <div class="trow">
+    <div class="bigcirc" style="border-color:var(--orange)"><h3>Cumulative Causation</h3><div class="d">Migration changes the sending community — generating more migration.</div></div>
+    <div class="tside">
+      <svg viewBox="0 0 430 130" aria-hidden="true" style="width:min(100%,380px)">
+        <path d="M150 18 A 52 52 0 1 1 98 70" fill="none" stroke="#EC7006" stroke-width="6" stroke-linecap="round"/>
+        <path d="M104 54 L 98 70 L 114 74" fill="none" stroke="#EC7006" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+        <g font-family="Inter,Arial" font-size="13" fill="#073F64" font-weight="600">
+          <text x="215" y="30">land prices rise</text><text x="215" y="70">labor grows scarce</text><text x="215" y="110">norms shift</text>
+        </g>
+      </svg>
+      <div class="tcap">Each departure <b>reshapes conditions at origin</b> — feeding the next departure.</div>
+    </div>
+  </div>
+</div>
+<div class="scene tv theory" data-t="57.3" data-tend="73.5">
+  <div class="trow">
+    <div class="bigcirc" style="border-color:var(--purple)"><h3>Transnationalism</h3><div class="d">Migrants keep meaningful economic, political, and cultural ties in several places at once.</div></div>
+    <div class="tside">
+      <svg viewBox="0 0 300 130" aria-hidden="true" style="width:min(100%,290px)">
+        <path d="M20 110 h70 v-34 l-35 -26 -35 26 z" fill="none" stroke="#B47AB3" stroke-width="5" stroke-linejoin="round"/>
+        <path d="M210 110 h70 v-34 l-35 -26 -35 26 z" fill="none" stroke="#B47AB3" stroke-width="5" stroke-linejoin="round"/>
+        <path d="M150 20 v100" stroke="#c9cdd4" stroke-width="3" stroke-dasharray="7 7"/>
+        <circle cx="150" cy="64" r="13" fill="#B47AB3"/>
+        <path d="M100 70 C 120 50 180 50 200 70 M100 84 C 120 104 180 104 200 84" stroke="#B47AB3" stroke-width="4" fill="none" stroke-linecap="round"/>
+      </svg>
+      <div class="tcap">Not "depart and assimilate" — <b>simultaneous belonging</b> across borders.</div>
+    </div>
+  </div>
+</div>
+<div class="fluid tv" data-t="73.5">
+  <svg class="arrowsN" viewBox="0 0 1376 774" fill="none" stroke="#073F64" stroke-width="6" aria-hidden="true">
+    <path d="M545 290 C 450 360 430 460 480 535" marker-end="url(#ah6n)"/>
+    <path d="M525 585 C 630 675 800 675 880 610" marker-end="url(#ah6n)"/>
+    <path d="M900 515 C 955 415 930 330 860 275" marker-end="url(#ah6n)"/>
+    <path d="M700 310 C 708 345 712 365 714 390" marker-end="url(#ah6n)" stroke-width="4.5"/>
+    <path d="M645 505 C 618 540 600 558 578 578" marker-end="url(#ah6n)" stroke-width="4.5"/>
+    <path d="M792 465 C 828 492 848 507 872 525" marker-end="url(#ah6n)" stroke-width="4.5"/>
+    <defs><marker id="ah6n" markerUnits="userSpaceOnUse" markerWidth="26" markerHeight="26" refX="18" refY="13" orient="auto"><path d="M0 0L26 13L0 26z" fill="#073F64"/></marker></defs>
+  </svg>
+  <div class="circ core" style="left:44%;top:46%;width:12.5%;aspect-ratio:1"><h3>Modern Synthesis</h3></div>
+  <div class="circ c-g" style="left:41%;top:11%;width:18%;aspect-ratio:1"><h3>Network Theory</h3><div class="d">Established networks lower future costs/risks.</div></div>
+  <div class="circ c-o" style="left:60%;top:58%;width:17.5%;aspect-ratio:1"><h3>Cumulative Causation</h3><div class="d">Migration alters conditions in origin &amp; destination.</div></div>
+  <div class="circ c-p" style="left:22%;top:58%;width:17.5%;aspect-ratio:1"><h3>Transnationalism</h3><div class="d">Simultaneous economic/social ties maintained.</div></div>
+  <div class="callout6 tv" data-t="76.0" style="left:32.5%;top:37%;width:13%"><b>De Haas (2010):</b> Integrating livelihoods and transnationalism.</div>
+  <div class="callout6 tv" data-t="76.0" style="left:45%;top:70%;width:13.5%"><b>Carling (2024):</b> Revisiting capabilities, volition, and push-pull.</div>
+</div>
+
+
 <aside class="slide-notes print-notes" hidden>
 <h3>Full slide detail</h3><ul>
 <li>Network theory (Massey et al., 1993): once established, migrant networks lower the costs and risks of subsequent moves, creating self-reinforcing flows that persist long after the original structural conditions have changed — explaining migration&#x27;s path-dependence.</li>
@@ -108,10 +483,52 @@
 <h3>Instructor notes</h3><p>Network theory is highly teachable because students can see it in their own communities — migration chains connecting specific sending towns to specific receiving cities. A useful exercise is to ask students to trace a specific migration corridor and identify the network mechanisms operating within it. Emphasize de Haas&#x27;s key contribution: migration outcomes are not determined by migration per se but by the wider political economy in which migration occurs.</p>
 <h3>Narration transcript</h3><p>Once we move beyond individual-level and economic explanations, we encounter frameworks that foreground social structure, historical accumulation, and transnational simultaneity. Network theory, as elaborated by Massey and colleagues, shows that migration is deeply path-dependent. Once a flow is established, networks of family and community ties reduce the information costs and risks for subsequent migrants, sustaining the flow even when original economic differentials narrow. This is why migration corridors — say, from Michoacán to Chicago, or from Sylhet to Bradford — persist over decades. Cumulative causation takes this further: migration changes conditions in sending communities — land prices rise, labor becomes scarce, social norms shift — in ways that generate further migration. And transnationalism complicates the assumption that migrants simply depart and assimilate. Many live in simultaneously meaningful ways in multiple places at once, maintaining economic, political, and cultural ties across borders. Hein de Haas synthesizes these insights to argue that migration&#x27;s relationship to development is deeply contingent — context shapes outcomes far more than migration itself.</p>
 </aside>
+<div class="segbot"><i class="b"></i><i class="g"></i><i class="o"></i><i class="p"></i></div>
 </section>
-<section class="slide img-slide" id="s7" data-kind="debate" data-audio="audio/module-01/slide-07.mp3">
-<h2 class="sr-only">The Politics of Definition: Who Counts as a Migrant?</h2>
-<img class="slide-art" src="img/module-01/slide-07.jpg" alt="The act of labeling and its consequence: economic migrant versus refugee determines protection and resources, or deportation and exclusion. Categories are political acts, not neutral descriptions (Tazzioli and Scheel); migration policies systematically fail by treating social transformations as manageable flows (Castles 2017).">
+<section class="slide nslide" id="s7" data-kind="debate" data-audio="audio/module-01/slide-07.mp3">
+<div class="segbar"><i class="g"></i><i class="b"></i><i class="o"></i><i class="y"></i><i class="p"></i><i class="sp"></i></div>
+<h2 class="stitle">The Politics of Definition</h2>
+
+<div class="scene tv" data-t="0" data-tend="10.8">
+  <svg class="illo" viewBox="0 0 420 160" aria-hidden="true">
+    <g transform="rotate(-8 130 80)"><rect x="55" y="50" width="150" height="56" rx="8" fill="none" stroke="#348DBC" stroke-width="5"/><text x="130" y="86" text-anchor="middle" font-family="Montserrat,Arial" font-weight="800" font-size="17" fill="#348DBC">ECONOMIC MIGRANT</text></g>
+    <text x="228" y="90" text-anchor="middle" font-family="Montserrat,Arial" font-weight="800" font-size="22" fill="#545454">vs.</text>
+    <g transform="rotate(6 320 84)"><rect x="255" y="56" width="130" height="56" rx="8" fill="none" stroke="#EC7006" stroke-width="5"/><text x="320" y="92" text-anchor="middle" font-family="Montserrat,Arial" font-weight="800" font-size="17" fill="#EC7006">REFUGEE</text></g>
+  </svg>
+  <div class="cap">Categories are never innocent. The label an official chooses <em>carries enormous practical consequences</em>.</div>
+</div>
+<div class="scene tv" data-t="10.8" data-tend="27.6">
+  <div class="trow" style="align-items:stretch">
+    <div class="banner" style="border-left-color:var(--orange);background:rgba(236,112,6,.08);flex:0 0 26%;display:flex;align-items:center;justify-content:center">The label</div>
+    <svg viewBox="0 0 120 160" style="width:9%" aria-hidden="true"><path d="M10 80 H55 M55 80 C 75 80 75 40 95 40 M55 80 C 75 80 75 120 95 120" fill="none" stroke="#073F64" stroke-width="7" stroke-linecap="round"/><path d="M88 30 l14 10 -14 10 M88 110 l14 10 -14 10" fill="none" stroke="#073F64" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <div style="flex:0 0 44%;display:flex;flex-direction:column;gap:8%;justify-content:center">
+      <div class="banner" style="border-left-color:var(--green);background:rgba(142,193,82,.14)">"Refugee" → protection, documentation, a hearing</div>
+      <div class="banner tv" data-t="24.4" style="border-left-color:var(--orange);background:rgba(236,112,6,.12)">"Economic migrant" → detention &amp; deportation</div>
+    </div>
+  </div>
+</div>
+<div class="scene tv" data-t="27.6" data-tend="46.3">
+  <div class="quotecard">
+    <div class="qt">"The very concept of <em style="color:var(--orange);font-style:normal">'the migrant'</em> is built from the nation-state's point of view — treating border crossing as deviance from normal stasis."</div>
+    <div class="qa">Tazzioli &amp; Scheel (2022) — categories are political acts, not neutral descriptions</div>
+  </div>
+</div>
+<div class="scene tv" data-t="46.3" data-tend="54.2">
+  <svg class="illo" viewBox="0 0 420 130" aria-hidden="true" style="width:min(30%,260px)">
+    <circle cx="180" cy="60" r="38" fill="none" stroke="#348DBC" stroke-width="7"/>
+    <path d="M208 88 l50 40" stroke="#348DBC" stroke-width="9" stroke-linecap="round"/>
+    <text x="180" y="70" text-anchor="middle" font-family="Montserrat,Arial" font-weight="800" font-size="26" fill="#073F64">?</text>
+  </svg>
+  <div class="cap">Ask of every category: <em>who benefits</em> from drawing the line exactly here?</div>
+</div>
+<div class="scene tv" data-t="54.2">
+  <div class="quotecard" style="border-color:var(--orange)">
+    <div class="qt">Restrictive policies keep failing because states treat migration as a controllable <em style="color:var(--orange);font-style:normal">"flow"</em> — when it is an expression of deep social transformation.</div>
+    <div class="qa">Castles (2017) — inequality, conflict, ecological change, family networks</div>
+  </div>
+</div>
+
+
 <aside class="slide-notes print-notes" hidden>
 <h3>Full slide detail</h3><ul>
 <li>Tazzioli and Scheel (2022) argue that migrant categories are not neutral descriptions but political acts: the nation-state-centered point of view embedded in the term &#x27;migrant&#x27; produces hierarchies of legitimacy and stigma.</li>
@@ -123,10 +540,49 @@
 <h3>Instructor notes</h3><p>This slide connects directly to the signature experience (reflective essay on migration narratives). Ask students: &#x27;Can you think of a case where the label applied to a group of migrants changed their fate?&#x27; The Haitian temporary protected status debates, or the EU&#x27;s treatment of Ukrainian versus Afghan asylum seekers in 2022, offer rich contemporary examples. Graduate students should engage with Tazzioli and Scheel on methodological nationalism.</p>
 <h3>Narration transcript</h3><p>Categories are never innocent. When a government official, a journalist, or an international organization labels someone an &#x27;economic migrant&#x27; rather than a &#x27;refugee,&#x27; that label carries enormous practical consequences. Refugees have rights under the 1951 Convention — to non-refoulement, to legal documentation, to a determination hearing. &#x27;Economic migrants&#x27; can be detained and deported. Martina Tazzioli and Stephan Scheel, in a 2022 article, argue that the very concept of &#x27;the migrant&#x27; is constructed from a nation-state-centered perspective that treats crossing borders as a deviation from normal stasis rather than a human practice with its own logic. They encourage us to examine who benefits from particular categorizations and whose interests are served by maintaining strict definitional boundaries. Stephen Castles puts it slightly differently: states treat migration as a controllable flow when it is actually an expression of deep social transformation — inequality, conflict, ecological change, family networks — and the mismatch between the model and reality is why restrictive policies so consistently fail to achieve their stated goals.</p>
 </aside>
+<div class="segbot"><i class="b"></i><i class="g"></i><i class="o"></i><i class="p"></i></div>
 </section>
-<section class="slide img-slide" id="s8" data-kind="concept" data-audio="audio/module-01/slide-08.mp3">
-<h2 class="sr-only">The Right to Migrate and the Right Not to Migrate</h2>
-<img class="slide-art" src="img/module-01/slide-08.jpg" alt="Hollifield&#x27;s liberal paradox: the right to leave, enshrined in UDHR Article 13, weighed against the missing right to enter — the legal gap. Alternative frameworks: the Global Compact (2018) and Indigenous perspectives on stasis as a right.">
+<section class="slide nslide" id="s8" data-kind="concept" data-audio="audio/module-01/slide-08.mp3">
+<div class="segbar"><i class="g"></i><i class="b"></i><i class="o"></i><i class="y"></i><i class="p"></i><i class="sp"></i></div>
+<h2 class="stitle">The Right to Migrate — and the Right Not To</h2>
+
+<div class="scene tv" data-t="0" data-tend="13.0">
+  <svg class="illo" viewBox="0 0 420 140" aria-hidden="true">
+    <path d="M210 70 H80" stroke="#348DBC" stroke-width="9" stroke-linecap="round"/><path d="M92 56 L74 70 l18 14" fill="none" stroke="#348DBC" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M210 70 H340" stroke="#EC7006" stroke-width="9" stroke-linecap="round"/><path d="M328 56 l18 14 -18 14" fill="none" stroke="#EC7006" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="120" y="40" text-anchor="middle" font-family="Montserrat,Arial" font-weight="800" font-size="16" fill="#348DBC">right to migrate</text>
+    <text x="300" y="112" text-anchor="middle" font-family="Montserrat,Arial" font-weight="800" font-size="16" fill="#EC7006">right not to migrate</text>
+  </svg>
+  <div class="cap">One of this course's most generative tensions: <em>two rights, pulling in opposite directions</em>.</div>
+</div>
+<div class="scene tv" data-t="13.0" data-tend="35.4">
+  <div class="trow">
+    <div class="banner" style="flex:0 0 38%;border-left-color:var(--blue)"><b>The right to LEAVE</b><br><span style="font-weight:600;font-size:.82em">Universal Declaration of Human Rights, Art. 13 — protected.</span></div>
+    <svg viewBox="0 0 80 80" style="width:6%" aria-hidden="true"><path d="M14 40h52M52 26l14 14-14 14" fill="none" stroke="#545454" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <div class="banner tv" data-t="18.5" style="flex:0 0 38%;border-left-color:var(--orange);border-style:dashed;border-width:2px;border-left-width:6px;background:rgba(236,112,6,.06)"><b>The right to ENTER</b><br><span style="font-weight:600;font-size:.82em">…largely missing from international law. <em style="color:var(--orange);font-style:normal">The legal gap.</em></span></div>
+  </div>
+</div>
+<div class="scene tv" data-t="35.4" data-tend="61.3">
+  <svg class="illo" viewBox="0 0 420 150" aria-hidden="true" style="width:min(34%,300px)">
+    <path d="M120 130 h180 v-64 l-90 -50 -90 50 z" fill="none" stroke="#8EC152" stroke-width="6" stroke-linejoin="round"/>
+    <path d="M210 58 l0 40 M192 78 h36" stroke="#8EC152" stroke-width="6" stroke-linecap="round"/>
+  </svg>
+  <div class="cap">The reverse framing matters just as much: <em>no one should be compelled to flee</em> their home.</div>
+  <div class="chiprow tv rise" data-t="51.0"><span class="chip gc">Global Compact on Migration (2018)</span><span class="chip">Objective: reduce the adverse drivers — so migration becomes truly voluntary</span></div>
+</div>
+<div class="scene tv" data-t="61.3">
+  <svg class="illo" viewBox="0 0 460 160" aria-hidden="true" style="width:min(50%,460px)">
+    <path d="M225 20 v120" stroke="#073F64" stroke-width="7"/>
+    <path d="M40 55 H210" stroke="#8EC152" stroke-width="8" stroke-linecap="round"/><path d="M250 55 H420" stroke="#8EC152" stroke-width="8" stroke-linecap="round"/><path d="M408 42 l18 13 -18 13" fill="none" stroke="#8EC152" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="110" y="42" font-family="Inter,Arial" font-weight="600" font-size="14" fill="#5a9435">capital &amp; goods: free</text>
+    <path d="M40 115 H190" stroke="#EC7006" stroke-width="8" stroke-linecap="round"/>
+    <path d="M205 98 l24 34 M229 98 l-24 34" stroke="#EC7006" stroke-width="8" stroke-linecap="round"/>
+    <text x="100" y="150" font-family="Inter,Arial" font-weight="600" font-size="14" fill="#EC7006">labor: restricted</text>
+  </svg>
+  <div class="cap">Hollifield's <em>liberal paradox</em>: democracies demand open movement for capital and goods — and closed borders for labor. The contradiction breeds incoherent, often cruel, policy.</div>
+</div>
+
+
 <aside class="slide-notes print-notes" hidden>
 <h3>Full slide detail</h3><ul>
 <li>Article 13 of the Universal Declaration of Human Rights (1948): &#x27;Everyone has the right to leave any country, including his own, and to return to his country&#x27; — a right to exit but conspicuously silent on the right to enter elsewhere.</li>
@@ -138,10 +594,42 @@
 <h3>Instructor notes</h3><p>The phrase &#x27;right not to migrate&#x27; may be unfamiliar to students but resonates immediately when explained: no one should be forced to leave their home through poverty, violence, or climate catastrophe. This reframes migration policy from a question of how to manage arrivals to how to address root causes. This also provides an opening for the Cabrini Institute&#x27;s human dignity framework without making the course explicitly religious.</p>
 <h3>Narration transcript</h3><p>One of the most generative frameworks for this course is the tension between two rights: the right to migrate and the right not to migrate. The Universal Declaration of Human Rights protects the right to leave any country. But international law says comparatively little about the right to enter another one. Receiving states retain broad — though not unlimited — discretion over who enters. This asymmetry is not accidental; it reflects the political architecture of a world organized around sovereign nation-states. But the reverse framing is equally important: the right not to migrate. No one should be compelled to flee their home because of structural violence, environmental collapse, or extreme deprivation. This framing appears in the 2018 Global Compact on Migration, which explicitly names reducing adverse drivers so that migration becomes truly voluntary as one of its core objectives. James Hollifield captures the structural tension facing liberal democratic states: they want free movement of capital and goods because globalization demands it, but they simultaneously want to restrict labor mobility — and this contradiction generates incoherent, often cruel, policies.</p>
 </aside>
+<div class="segbot"><i class="b"></i><i class="g"></i><i class="o"></i><i class="p"></i></div>
 </section>
-<section class="slide img-slide" id="s9" data-kind="data" data-audio="audio/module-01/slide-09.mp3">
-<h2 class="sr-only">Myths versus Realities: Common Misconceptions</h2>
-<img class="slide-art" src="img/module-01/slide-09.jpg" alt="Four myths versus realities: migration requires resources; 40 percent of international migration is South-to-South; the global share is nearly flat, 2.9 percent in 1990 to 3.7 percent in 2024; immigrants fill niches and complement native workers.">
+<section class="slide nslide" id="s9" data-kind="data" data-audio="audio/module-01/slide-09.mp3">
+<div class="segbar"><i class="g"></i><i class="b"></i><i class="o"></i><i class="y"></i><i class="p"></i><i class="sp"></i></div>
+<h2 class="stitle">Myths versus Realities</h2>
+
+<div style="position:absolute;inset:0;display:flex;flex-direction:column;padding:10.5% 3% 5%">
+  <div class="scene tv" data-t="0" data-tend="14.5" style="position:absolute;inset:0;background:#fff;z-index:3">
+    <svg class="illo" viewBox="0 0 420 160" aria-hidden="true">
+      <g transform="rotate(-6 120 70)"><path d="M50 40 h140 v46 a8 8 0 0 1 -8 8 h-100 l-16 16 v-16 h-8 a8 8 0 0 1 -8 -8z" fill="none" stroke="#9aa3ab" stroke-width="5"/><path d="M70 56h100M70 70h72" stroke="#c4cad1" stroke-width="5" stroke-linecap="round"/></g>
+      <g transform="rotate(5 300 90)"><path d="M230 60 h140 v46 a8 8 0 0 1 -8 8 h-100 l-16 16 v-16 h-8 a8 8 0 0 1 -8 -8z" fill="none" stroke="#9aa3ab" stroke-width="5"/><path d="M250 76h100M250 90h72" stroke="#c4cad1" stroke-width="5" stroke-linecap="round"/></g>
+      <path d="M180 20 L240 140 M240 20 L180 140" stroke="#EC7006" stroke-width="8" stroke-linecap="round"/>
+    </svg>
+    <div class="cap">Before the analytical core: clearing away the misconceptions students absorb from <em>media and everyday conversation</em>.</div>
+  </div>
+  <div class="rowsv" style="flex:1 1 auto">
+    <div class="rowv tv" data-t="14.5">
+      <div class="myth">Myth: migrants are <s>predominantly poor and uneducated</s></div>
+      <div class="real">Reality: migration <em>requires resources</em> — rates rise as countries develop <span style="font-weight:600;font-size:.7em;color:var(--gray)">(the "migration hump")</span></div>
+    </div>
+    <div class="rowv tv" data-t="33.4">
+      <div class="myth">Myth: most migration flows <s>South to North</s></div>
+      <div class="real">Reality: <em>≈40%</em> of international migration is <span class="tealx">South-to-South</span> <span style="font-weight:600;font-size:.7em;color:var(--gray)">(IOM World Migration Report)</span></div>
+    </div>
+    <div class="rowv tv" data-t="45.4">
+      <div class="myth">Myth: migration is <s>exploding</s> as a share of humanity</div>
+      <div class="real">Reality: <span class="tealx">2.9%</span> (1990) → <span class="tealx">3.7%</span> (2024) — growth, not a surge</div>
+    </div>
+    <div class="rowv tv" data-t="64.3">
+      <div class="myth">Myth: immigrants <s>take jobs from native workers</s></div>
+      <div class="real">Reality: labor economics finds <em>complementarity</em>, not substitution, at the aggregate level</div>
+    </div>
+  </div>
+</div>
+
+
 <aside class="slide-notes print-notes" hidden>
 <h3>Full slide detail</h3><ul>
 <li>Myth: migrants are predominantly poor and uneducated. Reality: migration requires resources; the very poorest are least likely to be able to migrate internationally; the &#x27;migration hump&#x27; theory (Martin &amp; Taylor, 1996) shows migration initially increases as incomes rise before declining.</li>
@@ -153,10 +641,41 @@
 <h3>Instructor notes</h3><p>This slide is essential for the &#x27;myths vs. realities&#x27; theme in the module outcomes. Prepare for students who have strong prior beliefs. The goal is not to convince students of a particular politics but to demand evidence. For each myth, ask: &#x27;Where does this belief come from? What does the evidence actually show?&#x27; Cite sources explicitly — modeling the standard you expect from students.</p>
 <h3>Narration transcript</h3><p>Before we proceed into the analytical core of migration studies, it is worth clearing away some of the most persistent misconceptions that shape public debate and that students will have absorbed from media and everyday conversation. The idea that migrants are predominantly poor, uneducated, and desperate reverses the empirical pattern: international migration requires resources. Research on the &#x27;migration hump&#x27; shows that migration rates actually increase as countries develop economically before eventually declining. The framing that most migration flows from South to North also distorts reality. The IOM World Migration Report finds roughly 40 percent of migration is South-to-South. And the claim that migration is exploding as a share of world population is contradicted by data: in 1990 international migrants were 2.9 percent of the global population; by 2024, 3.7 percent. That is meaningful growth but not the dramatic surge the political discourse implies. Finally, the intuition that immigrants displace native workers is consistently contradicted by labor economics research, which finds complementarity, not substitution, at the aggregate level.</p>
 </aside>
+<div class="segbot"><i class="b"></i><i class="g"></i><i class="o"></i><i class="p"></i></div>
 </section>
-<section class="slide img-slide" id="s10" data-kind="concept" data-audio="audio/module-01/slide-10.mp3">
-<h2 class="sr-only">Migration as a Global System</h2>
-<img class="slide-art" src="img/module-01/slide-10.jpg" alt="Migration as a circular global system between origin and destination societies, linked by information, remittances, and return migration. Wealthy destinations dictate visa rules; capital moves freely while people do not.">
+<section class="slide nslide" id="s10" data-kind="concept" data-audio="audio/module-01/slide-10.mp3">
+<div class="segbar"><i class="g"></i><i class="b"></i><i class="o"></i><i class="y"></i><i class="p"></i><i class="sp"></i></div>
+<h2 class="stitle">Migration as a Global System</h2>
+
+<div class="scene tv" data-t="0" data-tend="19.2">
+  <svg class="illo" viewBox="0 0 420 170" aria-hidden="true">
+    <g fill="#9aa3ab"><circle cx="40" cy="40" r="7"/><circle cx="110" cy="90" r="7"/><circle cx="60" cy="140" r="7"/><circle cx="150" cy="30" r="7"/></g>
+    <path d="M195 85 h40" stroke="#545454" stroke-width="5" stroke-linecap="round"/><path d="M226 74 l14 11 -14 11" fill="none" stroke="#545454" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+    <g fill="#348DBC"><circle cx="290" cy="40" r="8"/><circle cx="360" cy="70" r="8"/><circle cx="300" cy="120" r="8"/><circle cx="380" cy="135" r="8"/></g>
+    <g stroke="#348DBC" stroke-width="3.5" fill="none"><path d="M290 40 360 70 M360 70 380 135 M300 120 380 135 M290 40 300 120 M300 120 360 70"/></g>
+  </svg>
+  <div class="cap">Not a collection of unrelated individual decisions — <em>overlapping systems</em> of history, economy, networks, and politics.</div>
+</div>
+<div class="fluid tv" data-t="19.2">
+  <svg class="arrowsN" viewBox="0 0 1376 774" fill="none" aria-hidden="true">
+    <path d="M400 400 C 470 220 900 220 975 390" stroke="#073F64" stroke-width="26" stroke-linecap="round"/>
+    <path d="M958 330 l22 62 -64 -14" fill="#073F64" stroke="none"/>
+    <path d="M975 470 C 900 640 470 640 405 480" stroke="#073F64" stroke-width="26" stroke-linecap="round"/>
+    <path d="M424 540 l-22 -62 64 14" fill="#073F64" stroke="none"/>
+    <text x="688" y="235" text-anchor="middle" font-family="Montserrat,Arial" font-weight="800" font-size="30" fill="#073F64">information · remittances</text>
+    <text x="688" y="675" text-anchor="middle" font-family="Montserrat,Arial" font-weight="800" font-size="30" fill="#073F64">return migration</text>
+  </svg>
+  <div class="circ" style="left:13%;top:38%;width:15%;aspect-ratio:1"><h3>Origin Society</h3></div>
+  <div class="circ" style="left:73%;top:38%;width:15%;aspect-ratio:1"><h3>Destination Society</h3></div>
+  <div style="position:absolute;left:34%;top:41%;width:32%;text-align:center">
+    <div class="tcap" style="text-align:center"><b>Stable, persistent bilateral relationships</b><br><small>each system with its own logic, history, and rules</small></div>
+  </div>
+  <div class="inset tv" data-t="31.6" data-tend="43.3"><div class="it"><b>US – Mexico</b><br><small>consolidated over a century: Bracero Program, family networks, labor demand</small></div></div>
+  <div class="inset tv" data-t="43.3" data-tend="65.0"><div class="it"><b>The Gulf system</b><br><small>South &amp; Southeast Asian workers under temporary contract regimes</small></div></div>
+  <div class="inset tv" data-t="65.0" style="width:34%"><div class="it"><b>Ignore system dynamics — walls, quotas — and flows don't stop.</b><br><small>They redirect, often into more dangerous routes.</small></div></div>
+</div>
+
+
 <aside class="slide-notes print-notes" hidden>
 <h3>Full slide detail</h3><ul>
 <li>Migration systems theory (Kritz, Lim &amp; Zlotnik, 1992): migration flows and counterflows link origin and destination societies through economic, political, cultural, and historical ties that constitute relatively stable &#x27;migration systems.&#x27;</li>
@@ -168,10 +687,36 @@
 <h3>Instructor notes</h3><p>The migration systems lens is useful for graduate courses because it shifts attention from individual decisions to the relational structures that sustain flows. For undergraduate classes, map a few specific systems on a whiteboard — US-Mexico, UK-South Asia, Gulf-South/Southeast Asia — and ask students to identify the colonial, economic, and social ties that sustain each. This demonstrates the theory without requiring students to read the technical literature.</p>
 <h3>Narration transcript</h3><p>Migration is not a collection of unrelated individual decisions. It is a system — or rather, a set of overlapping systems — in which historical ties, economic interdependencies, social networks, and political arrangements structure who moves, where, and through what channels. Migration systems theory, developed in the early 1990s, asks us to think about stable, persistent sets of bilateral relationships between origin and destination regions. The US-Mexico system, consolidated over more than a century through the Bracero Program, family networks, and labor demand, is one of the most studied in the world. The Gulf state labor migration system, drawing workers from South and Southeast Asia under temporary contract regimes, is another. Each system has its own logic, its own history, and its own rules. Understanding the systemic character of migration is crucial for both analysis and policy: interventions that ignore system dynamics — like building walls or tightening visa quotas without addressing root causes — tend to redirect flows rather than stop them, often into more dangerous routes.</p>
 </aside>
+<div class="segbot"><i class="b"></i><i class="g"></i><i class="o"></i><i class="p"></i></div>
 </section>
-<section class="slide img-slide" id="s11" data-kind="case" data-audio="audio/module-01/slide-11.mp3">
-<h2 class="sr-only">Case: Venezuelan Displacement as a Contemporary Migration System</h2>
-<img class="slide-art" src="img/module-01/slide-11.jpg" alt="Case study: 7.8 million total displaced Venezuelans as of mid-2024, driven by hyperinflation and political repression. 97 percent remain in Latin America, proving the South-to-South reality; 2.9 million are hosted in Colombia alone.">
+<section class="slide nslide" id="s11" data-kind="case" data-audio="audio/module-01/slide-11.mp3">
+<div class="segbar"><i class="g"></i><i class="b"></i><i class="o"></i><i class="y"></i><i class="p"></i><i class="sp"></i></div>
+<h2 class="stitle">Case: Venezuelan Displacement</h2>
+
+<div class="scene tv" data-t="0" data-tend="8.1">
+  <svg class="illo" viewBox="0 0 420 160" aria-hidden="true" style="width:min(30%,260px)">
+    <path d="M210 20 c-45 0 -80 33 -80 72 c0 44 80 58 80 58 s80 -14 80 -58 c0 -39 -35 -72 -80 -72z" fill="none" stroke="#EC7006" stroke-width="6"/>
+    <circle cx="210" cy="88" r="26" fill="#EC7006"/>
+  </svg>
+  <div class="cap">Theory, grounded: <em>consider Venezuela</em>.</div>
+</div>
+<div class="tv" data-t="8.1" style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:11% 6% 5%;gap:1.6%">
+  <div style="display:flex;align-items:center;gap:5%;width:100%;justify-content:center">
+    <div style="text-align:center"><div class="bignm n-o" data-count="7.8" data-suffix="M" data-dec="1" data-start="8.1">7.8M</div><div class="lbl">Venezuelans displaced by mid-2024 <span style="color:#9aa3ab">· UN R4V</span></div></div>
+    <div class="vr tv" data-t="44.6"></div>
+    <div style="text-align:center" class="tv rise" data-t="44.6"><div class="bignm n-b" data-count="85" data-suffix="%" data-start="44.6">85%</div><div class="lbl">remain in Latin America — the South-to-South reality</div></div>
+  </div>
+  <div class="chiprow tv rise" data-t="20.8">
+    <span class="chip oc">economy in freefall</span><span class="chip oc">political repression</span><span class="chip oc">collapsed public services</span><span class="chip oc">violence</span>
+  </div>
+  <div class="cap tv" data-t="27.9" data-tend="44.6" style="font-size:clamp(13px,1.9cqw,21px)">Salary worth nothing, hospitals out of medicine — is leaving a <em>"voluntary economic choice"</em>? The continuum, in vivid form.</div>
+  <div class="chiprow tv rise" data-t="52.2">
+    <span class="chip">Colombia</span><span class="chip">Peru</span><span class="chip">Ecuador</span><span class="chip">Chile</span><span class="chip gc" style="font-weight:700">middle-income hosts, under enormous strain</span>
+  </div>
+  <div class="banner tv rise" data-t="61.2" style="width:92%">Colombia's Temporary Protection Status (2021) — protection for nearly <b>one million</b> Venezuelans — is one of this decade's most significant humanitarian policy innovations.</div>
+</div>
+
+
 <aside class="slide-notes print-notes" hidden>
 <h3>Full slide detail</h3><ul>
 <li>Venezuela has produced what R4V (the UN regional platform) calls the largest displacement crisis in the Western Hemisphere: as of mid-2024, 7.8 million Venezuelan refugees and migrants had fled the country, predominantly to Colombia (2.9 million), Peru (1 million), Ecuador, and Chile.</li>
@@ -183,10 +728,37 @@
 <h3>Instructor notes</h3><p>This case works at multiple levels: it exemplifies South-South migration, demonstrates multi-causal drivers, tests legal definitions, and showcases a policy innovation (Colombia&#x27;s TPS) that is often overlooked in North-Atlantic-centric migration courses. Ask students: &#x27;Why does the Venezuelan crisis receive less media attention in North America and Europe than the Syrian or Afghan crises? What does that tell us about how migration narratives are shaped?&#x27;</p>
 <h3>Narration transcript</h3><p>To ground these theoretical frameworks in lived reality, consider Venezuela. By mid-2024, according to the UN&#x27;s R4V platform, 7.8 million Venezuelans had fled the country — making this the largest displacement crisis in the Western Hemisphere. What drove them? The answer is almost impossible to disentangle: an economy in freefall, political repression, collapsed public services, violence. This is the voluntary-forced continuum in vivid form. Is a person who leaves because their salary is worth nothing and the hospitals have run out of medicine making a &#x27;voluntary economic choice&#x27;? The Venezuelan case also challenges geographic stereotypes. 85 percent of displaced Venezuelans remain in Latin America — they did not head to Europe or North America. They are guests of Colombia, Peru, Ecuador, and Chile — middle-income countries under enormous strain. Colombia&#x27;s decision to grant Temporary Protection Status to nearly one million Venezuelans in 2021 is one of the most significant humanitarian policy innovations of this decade, and it deserves far more attention in migration courses than it typically receives.</p>
 </aside>
+<div class="segbot"><i class="b"></i><i class="g"></i><i class="o"></i><i class="p"></i></div>
 </section>
-<section class="slide img-slide" id="s12" data-kind="concept" data-audio="audio/module-01/slide-12.mp3">
-<h2 class="sr-only">Cross-Disciplinary Perspectives on Migration</h2>
-<img class="slide-art" src="img/module-01/slide-12.jpg" alt="Cross-disciplinary wheel: sociology, economics, political science, law and human rights, and geography and demography each illuminate migration.">
+<section class="slide nslide" id="s12" data-kind="concept" data-audio="audio/module-01/slide-12.mp3">
+<div class="segbar"><i class="g"></i><i class="b"></i><i class="o"></i><i class="y"></i><i class="p"></i><i class="sp"></i></div>
+<h2 class="stitle">One Phenomenon, Many Disciplines</h2>
+
+<div class="scene tv" data-t="0" data-tend="9.8">
+  <svg class="illo" viewBox="0 0 420 150" aria-hidden="true" style="width:min(30%,250px)">
+    <circle cx="210" cy="75" r="34" fill="#348DBC"/>
+    <g fill="none" stroke="#9aa3ab" stroke-width="4"><path d="M210 41 v-22 M210 109 v22 M176 75 h-24 M244 75 h24 M186 51 l-18 -18 M234 51 l18 -18 M186 99 l-18 18 M234 99 l18 18"/></g>
+  </svg>
+  <div class="cap">Migration is <em>owned by no single discipline</em> — and that is exactly what makes it rich material for teaching.</div>
+</div>
+<div class="scene tv theory" data-t="9.8" data-tend="16.1"><div class="trow"><div class="bigcirc" style="border-color:var(--orange)"><h3>Sociology</h3><div class="d">Stratification, community change, identity.</div></div></div></div>
+<div class="scene tv theory" data-t="16.1" data-tend="20.9"><div class="trow"><div class="bigcirc" style="border-color:#1FA9A5"><h3>Economics</h3><div class="d">Labor markets, remittances, fiscal impacts.</div></div></div></div>
+<div class="scene tv theory" data-t="20.9" data-tend="31.1"><div class="trow"><div class="bigcirc" style="border-color:var(--purple)"><h3>Political Science</h3><div class="d">How states manage migration, how parties mobilize around it, what citizenship means.</div></div></div></div>
+<div class="scene tv theory" data-t="31.1" data-tend="42.5"><div class="trow"><div class="bigcirc" style="border-color:var(--gold)"><h3>Geography &amp; Demography</h3><div class="d">Spatial patterns, routes, population dynamics reshaping communities.</div></div></div></div>
+<div class="scene tv theory" data-t="42.5" data-tend="53.0"><div class="trow"><div class="bigcirc" style="border-color:var(--green)"><h3>Law &amp; Human Rights</h3><div class="d">Who has rights, under what conditions, enforceable by whom.</div></div></div></div>
+<div class="scene tv theory" data-t="53.0" data-tend="64.2"><div class="trow"><div class="bigcirc" style="border-color:var(--blue)"><h3>Anthropology &amp; Cultural Studies</h3><div class="d">Lived experience — what it means to belong, or to be excluded.</div></div></div></div>
+<div class="fluid tv" data-t="64.2">
+  <div class="circ core" style="left:41.5%;top:34%;width:17%;aspect-ratio:1"><h3>MIGRATION</h3></div>
+  <div class="circ c-o" style="left:42.5%;top:8%;width:15%;aspect-ratio:1"><h3 style="font-size:clamp(10px,1.4cqw,16px)">Sociology</h3></div>
+  <div class="circ" style="left:64%;top:22%;width:15%;aspect-ratio:1;border-color:#1FA9A5"><h3 style="font-size:clamp(10px,1.4cqw,16px)">Economics</h3></div>
+  <div class="circ c-p" style="left:66%;top:56%;width:15%;aspect-ratio:1"><h3 style="font-size:clamp(10px,1.4cqw,16px)">Political Science</h3></div>
+  <div class="circ c-y" style="left:21%;top:22%;width:15%;aspect-ratio:1"><h3 style="font-size:clamp(10px,1.4cqw,16px)">Geography &amp; Demography</h3></div>
+  <div class="circ c-g" style="left:19%;top:56%;width:15%;aspect-ratio:1"><h3 style="font-size:clamp(10px,1.4cqw,16px)">Law &amp; Human Rights</h3></div>
+  <div class="circ c-lb" style="left:42.5%;top:67%;width:15%;aspect-ratio:1"><h3 style="font-size:clamp(10px,1.4cqw,16px)">Anthropology</h3></div>
+  <div class="banner tv" data-t="69.8" style="position:absolute;left:20%;right:20%;bottom:2.5%;font-size:clamp(11px,1.5cqw,17px);padding:.8% 2%">This course draws on all of them — being stretched toward unfamiliar terrain is <b>pedagogically productive</b>.</div>
+</div>
+
+
 <aside class="slide-notes print-notes" hidden>
 <h3>Full slide detail</h3><ul>
 <li>Sociology examines migration&#x27;s impact on social structures, stratification, identity, and community — migration reshapes families, gender roles, and class hierarchies in both sending and receiving societies.</li>
@@ -199,10 +771,45 @@
 <h3>Instructor notes</h3><p>For faculty from non-social science disciplines, this slide validates their existing expertise as an entry point into migration studies. A sociologist brings one toolkit; an economist another; a theologian yet another. The course&#x27;s interdisciplinary design is a strength, not a weakness. Invite faculty to identify which disciplinary lens feels most natural to them and where they feel most challenged to stretch.</p>
 <h3>Narration transcript</h3><p>Migration is not owned by any single discipline. It is inherently interdisciplinary, and that is one reason it is such rich material for teaching. Sociologists bring frameworks for understanding stratification, community change, and identity. Economists bring tools for analyzing labor markets, remittances, and fiscal impacts. Political scientists examine how states manage migration, how parties mobilize around it, and what citizenship means in an era of global mobility. Geographers and demographers track the spatial and population dynamics — where flows originate, what routes they follow, how they reshape urban and rural communities. Lawyers and human rights scholars examine the normative frameworks — who has rights, under what conditions, enforceable by whom. And anthropologists and cultural studies scholars attend to lived experience, to the texture of what it means to be a migrant, to belong somewhere, or to be excluded. This course deliberately draws on all these perspectives. Faculty from different fields will find their disciplinary home here — and will be stretched toward unfamiliar terrain. That discomfort is pedagogically productive.</p>
 </aside>
+<div class="segbot"><i class="b"></i><i class="g"></i><i class="o"></i><i class="p"></i></div>
 </section>
-<section class="slide img-slide" id="s13" data-kind="concept" data-audio="audio/module-01/slide-13.mp3">
-<h2 class="sr-only">The Human Dignity Frame</h2>
-<img class="slide-art" src="img/module-01/slide-13.jpg" alt="The human dignity frame: a Venn diagram joining Catholic social teaching (Pope Francis, Laudato Si&#x27;, Laudate Deum) and secular philosophy and law (human rights law, Benhabib, Nussbaum) around inherent worth and rights-bearing status. Dignity does not predetermine policy outcomes, but sets the non-negotiable boundaries of border management.">
+<section class="slide nslide" id="s13" data-kind="concept" data-audio="audio/module-01/slide-13.mp3">
+<div class="segbar"><i class="g"></i><i class="b"></i><i class="o"></i><i class="y"></i><i class="p"></i><i class="sp"></i></div>
+<h2 class="stitle">The Human Dignity Frame</h2>
+
+<div class="scene tv" data-t="0" data-tend="6.5">
+  <svg class="illo" viewBox="0 0 420 140" aria-hidden="true">
+    <g fill="#348DBC"><circle cx="90" cy="50" r="12"/><rect x="79" y="65" width="22" height="40" rx="9"/></g>
+    <g fill="#8EC152"><circle cx="170" cy="50" r="12"/><rect x="159" y="65" width="22" height="40" rx="9"/></g>
+    <g fill="#EC7006"><circle cx="250" cy="50" r="12"/><rect x="239" y="65" width="22" height="40" rx="9"/></g>
+    <g fill="#B47AB3"><circle cx="330" cy="50" r="12"/><rect x="319" y="65" width="22" height="40" rx="9"/></g>
+  </svg>
+  <div class="cap">One framing runs through the <em>entire course</em>.</div>
+</div>
+<div class="scene tv" data-t="6.5" data-tend="50.0">
+  <div class="quotecard" style="border-width:3px">
+    <div class="qt" style="font-size:clamp(18px,2.8cqw,32px)">Every person in the migration system is a human being with <em style="color:var(--orange);font-style:normal">inherent worth</em>.</div>
+  </div>
+  <div class="chiprow tv rise" data-t="18.1">
+    <span class="chip">crossing a border</span><span class="chip">waiting in a camp</span><span class="chip">working without documents</span><span class="chip">manning a border post</span>
+  </div>
+  <div class="chiprow tv rise" data-t="31.8">
+    <span class="chip gc">prohibition of torture</span><span class="chip gc">right to seek asylum</span><span class="chip gc">protections for children</span><span class="chip oc" style="font-weight:700">legally binding — paperwork or not</span>
+  </div>
+</div>
+<div class="fluid tv" data-t="50.0">
+  <div style="position:absolute;left:12%;top:16%;width:44%;height:66%;border:5px solid #1FA9A5;border-radius:50%;background:rgba(31,169,165,.08)"></div>
+  <div style="position:absolute;left:44%;top:16%;width:44%;height:66%;border:5px solid var(--purple);border-radius:50%;background:rgba(180,122,179,.08)"></div>
+  <div style="position:absolute;left:16%;top:36%;width:20%;text-align:center"><div class="tcap"><b>Catholic Social Teaching</b><br><small>Pope Francis · Laudato Si' · Laudate Deum</small></div></div>
+  <div style="position:absolute;left:64%;top:36%;width:20%;text-align:center"><div class="tcap"><b>Secular Philosophy &amp; Law</b><br><small>human rights law · Benhabib · Nussbaum</small></div></div>
+  <div style="position:absolute;left:38%;top:33%;width:24%;text-align:center;background:var(--navy);border-radius:14px;padding:1.6% 1%;color:#fff">
+    <div style="font-family:Montserrat,Arial;font-weight:800;font-size:clamp(13px,1.9cqw,22px);line-height:1.15">THE HUMAN DIGNITY FRAME</div>
+    <div style="font-size:clamp(9px,1.2cqw,13px);margin-top:5px;color:#d9e4ee">inherent worth &amp; rights-bearing status<br>(family unity · non-refoulement · child protection)</div>
+  </div>
+  <div class="banner tv" data-t="59.9" style="position:absolute;left:8%;right:8%;bottom:3%;font-size:clamp(11px,1.5cqw,17px);padding:.8% 2%">Dignity doesn't settle the hard policy questions — it sets the <b>non-negotiable boundaries</b> within which they must be answered.</div>
+</div>
+
+
 <aside class="slide-notes print-notes" hidden>
 <h3>Full slide detail</h3><ul>
 <li>Human dignity as a migration studies foundation: regardless of legal status, nationality, or origin, migrants are rights-bearing persons with inherent worth — a claim grounded in international human rights law and across major religious and secular ethical traditions.</li>
@@ -214,10 +821,25 @@
 <h3>Instructor notes</h3><p>Given the Villanova/Cabrini Institute context, this slide makes the course&#x27;s values explicit without being exclusionary. Emphasize that the dignity frame is also grounded in international human rights law, accessible to secular and religious institutions alike. The point is not that all migration should be unrestricted but that the humanity of every person in the migration system — border agent, asylum seeker, undocumented worker, unaccompanied child — is inviolable.</p>
 <h3>Narration transcript</h3><p>Before we close this foundational module, it is important to name one framing that runs through the entire course: human dignity. Whatever our disciplinary background, whatever policy positions we hold or teach, every person in the migration system — every person who has crossed a border, who is waiting in a camp, who is working without documents, who is manning a border post — is a human being with inherent worth. This is not a naive or purely aspirational claim. It is grounded in international human rights law. The prohibition of torture, the right to seek asylum, the protections for children — these are legally binding obligations, not optional courtesies. They apply regardless of whether a person has the right paperwork. The human dignity frame does not resolve the hard policy questions — it does not tell us exactly how many people a state must admit, or what kind of enforcement is proportionate. But it insists that these questions must be answered within constraints set by the irreducible humanity of every person involved. That is the foundation from which this course operates.</p>
 </aside>
+<div class="segbot"><i class="b"></i><i class="g"></i><i class="o"></i><i class="p"></i></div>
 </section>
-<section class="slide img-slide" id="s14" data-kind="discussion" data-audio="audio/module-01/slide-14.mp3">
-<h2 class="sr-only">Signature Experience: Reflective Essay on Migration Narratives</h2>
-<img class="slide-art" src="img/module-01/slide-14.jpg" alt="Discussion prompt: what shapes migration narratives in your discipline, your media environment, and your own prior assumptions — and how has this module challenged or confirmed those narratives? Signature experience: reflective essay.">
+<section class="slide nslide" id="s14" data-kind="discussion" data-audio="audio/module-01/slide-14.mp3">
+<div class="segbar"><i class="g"></i><i class="b"></i><i class="o"></i><i class="y"></i><i class="p"></i><i class="sp"></i></div>
+<h2 class="stitle">Signature Experience: The Reflective Essay</h2>
+
+<div class="tv" data-t="0" style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:2%;padding:11% 7% 5%">
+  <div class="quotecard" style="max-width:88%">
+    <div class="qt" style="font-size:clamp(16px,2.5cqw,29px)">What shapes migration narratives — and how has this module <em style="color:var(--orange);font-style:normal">challenged or confirmed</em> them?</div>
+    <div class="chiprow tv rise" data-t="6.0" style="margin-top:10px"><span class="chip">your discipline</span><span class="chip">your media environment</span><span class="chip oc">your own prior assumptions</span></div>
+  </div>
+  <div class="chiprow tv rise" data-t="29.2" style="max-width:90%">
+    <span class="chip pc">What am I assuming?</span><span class="chip pc">Where did that assumption come from?</span><span class="chip pc tv rise" data-t="34.7">What would I have to see to update it?</span>
+  </div>
+  <div class="banner tv rise" data-t="37.0" style="width:88%;border-left-color:var(--purple);background:rgba(180,122,179,.1)"><b>Graduate extension:</b> apply two or more of the module's frameworks to one migration flow — what does each illuminate?</div>
+  <div class="thesisline tv rise" data-t="51.1" style="width:70%">From unreflective assumption → to examined knowledge.</div>
+</div>
+
+
 <aside class="slide-notes print-notes" hidden>
 <h3>Full slide detail</h3><ul>
 <li>Prompt: &#x27;What shapes migration narratives in your discipline, your media environment, and your own prior assumptions — and how has this module challenged or confirmed those narratives?&#x27;</li>
@@ -229,10 +851,33 @@
 <h3>Instructor notes</h3><p>Encourage faculty to model the exercise themselves: share (briefly) one assumption about migration they held before studying it that evidence changed. This models intellectual humility and demonstrates that migration studies challenges everyone, not just students. Set clear expectations: the essay should engage with at least two readings from the module and demonstrate engagement with definitions, not just opinions.</p>
 <h3>Narration transcript</h3><p>This module&#x27;s signature experience is a reflective essay. The prompt asks: what shapes migration narratives — in your discipline, your media environment, and your own prior assumptions — and how has this first module challenged or confirmed those narratives? Notice that this exercise does not ask students to take a policy position. It asks them to examine the frames through which they have been learning about migration before this course began. That is a methodological practice, not just a personal exercise. Good researchers in any field surface their own positionality. They ask: what am I assuming? Where did that assumption come from? What would I have to see to update it? Graduate students are asked to extend this by applying two or more theoretical frameworks from the module to a specific migration flow and evaluating what each one illuminates. Both versions of the assignment serve the same core goal: moving from unreflective assumption to examined knowledge.</p>
 </aside>
+<div class="segbot"><i class="b"></i><i class="g"></i><i class="o"></i><i class="p"></i></div>
 </section>
-<section class="slide img-slide" id="s15" data-kind="takeaways" data-audio="audio/module-01/slide-15.mp3">
-<h2 class="sr-only">Takeaways: Foundations of Global Migration</h2>
-<img class="slide-art" src="img/module-01/slide-15.jpg" alt="Six key takeaways: migration is a fundamental human behavior, not an aberration; core legal definitions carry precise, life-altering protective consequences; the voluntary/forced binary is analytically insufficient; no single theory explains migration — multiple scales are required; migration categorization is an act of political power; the human dignity frame provides a shared normative foundation.">
+<section class="slide nslide" id="s15" data-kind="takeaways" data-audio="audio/module-01/slide-15.mp3">
+<div class="segbar"><i class="g"></i><i class="b"></i><i class="o"></i><i class="y"></i><i class="p"></i><i class="sp"></i></div>
+<h2 class="stitle">Takeaways: Foundations of Global Migration</h2>
+
+<div style="position:absolute;inset:0;display:flex;flex-direction:column;padding:10.5% 2.5% 5%">
+  <div class="scene tv" data-t="0" data-tend="5.7" style="position:absolute;inset:0;background:#fff;z-index:3">
+    <svg class="illo" viewBox="0 0 420 140" aria-hidden="true" style="width:min(28%,240px)">
+      <g fill="none" stroke="#348DBC" stroke-width="5"><circle cx="210" cy="70" r="46"/><path d="M210 24v92M164 70h92M177 37l66 66M243 37l-66 66"/></g>
+    </svg>
+    <div class="cap">Consolidating this opening module.</div>
+  </div>
+  <div class="cols grow-group" style="flex:1 1 0">
+    <div class="col tv rise" data-t="5.7"><h3 style="color:var(--blue)">1</h3><div class="d"><b>Migration is as old as humanity.</b> The challenge is the systems of control, protection, and meaning built around it.</div></div>
+    <div class="col tv rise" data-t="18.9"><h3 style="color:var(--green)">2</h3><div class="d"><b>Vocabulary has consequences.</b> Migrant, refugee, asylum seeker, IDP, stateless — distinct categories, distinct fates.</div></div>
+    <div class="col tv rise" data-t="32.3"><h3 style="color:var(--orange)">3</h3><div class="d"><b>The binary dissolves.</b> Carling's aspiration–ability framework is more precise — and more humane.</div></div>
+  </div>
+  <div class="cols grow-group" style="flex:1 1 0">
+    <div class="col tv rise" data-t="44.3"><h3 style="color:var(--purple)">4</h3><div class="d"><b>Every theory is incomplete.</b> Each illuminates one scale; hold them in tension.</div></div>
+    <div class="col tv rise" data-t="51.5"><h3 style="color:var(--gold)">5</h3><div class="d"><b>Counting is political.</b> Defining and labeling migrants is an act of power.</div></div>
+    <div class="col tv rise" data-t="58.1"><h3 style="color:#1FA9A5">6</h3><div class="d"><b>Dignity frames everything.</b> Policy debates must respect the irreducible humanity of every person.</div></div>
+  </div>
+  <div class="banner tv rise" data-t="70.6" style="margin-top:1%">These are the foundations. <b>The next twelve modules build on them.</b></div>
+</div>
+
+
 <aside class="slide-notes print-notes" hidden>
 <h3>Full slide detail</h3><ul>
 <li>Migration is a fundamental human behavior, not an aberration — 304 million international migrants in 2024 represent 3.7 percent of world population, with far more migration occurring internally and regionally.</li>
@@ -245,10 +890,24 @@
 <h3>Instructor notes</h3><p>Return to these takeaways at the start of the &#x27;Migration Data and Global Trends&#x27; module. Invite students to add one additional insight they are carrying forward from the week&#x27;s readings and discussion. Building cumulative synthesis habits early in the course pays dividends later when frameworks from multiple modules must be held simultaneously.</p>
 <h3>Narration transcript</h3><p>Let us consolidate what we have covered in this opening module. Human migration is as old as humanity itself — the analytical and policy challenge is not the movement but the systems of control, protection, and meaning-making that have grown up around it. We have established the core vocabulary: migrant, refugee, asylum seeker, IDP, stateless person — each a distinct legal and analytical category with real consequences. We have seen that the voluntary-forced binary dissolves under scrutiny into a continuum, and that Carling&#x27;s aspiration-ability framework is more precise and more humane than the blunt binary. We have surveyed the major theoretical traditions, finding each illuminating and each incomplete. We have seen that the act of defining and counting migrants is itself political. And we have grounded the entire enterprise in a human dignity frame that does not resolve policy debates but insists they must respect the irreducible humanity of every person in the migration system. These are the foundations. The next twelve modules build on them.</p>
 </aside>
+<div class="segbot"><i class="b"></i><i class="g"></i><i class="o"></i><i class="p"></i></div>
 </section>
-<section class="slide img-slide" id="s16" data-kind="readings">
-<h2 class="sr-only">Go deeper: essential readings</h2>
-<img class="slide-art" src="img/module-01/slide-16.jpg" alt="Go deeper — essential readings: Massey et al. 1993 (Theories of International Migration), de Haas 2010 (Migration and Development), Carling 2002 (Involuntary Immobility), Tazzioli and Scheel 2022 (Who is a Migrant?), Carling 2024 (Why Do People Migrate?). Full annotated list with DOIs and curated videos available on the module page.">
+<section class="slide nslide" id="s16" data-kind="readings">
+<div class="segbar"><i class="g"></i><i class="b"></i><i class="o"></i><i class="y"></i><i class="p"></i><i class="sp"></i></div>
+<h2 class="stitle">Go Deeper: Essential Readings</h2>
+
+<div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:11% 4% 5%">
+  <div class="readgrid">
+    <div class="read" style="border-left-color:var(--blue)"><b>Massey et al. (1993)</b><span>Theories of International Migration — the canonical map of the theoretical landscape.</span></div>
+    <div class="read" style="border-left-color:var(--green)"><b>de Haas (2010)</b><span>Migration and Development — why outcomes are heterogeneous and context-dependent.</span></div>
+    <div class="read" style="border-left-color:var(--orange)"><b>Carling (2002)</b><span>Involuntary immobility and the aspiration/ability framework.</span></div>
+    <div class="read" style="border-left-color:var(--purple)"><b>Tazzioli &amp; Scheel (2022)</b><span>Who is a Migrant? — the politics of categorization.</span></div>
+    <div class="read" style="border-left-color:var(--gold)"><b>Carling (2024)</b><span>Why Do People Migrate? — fresh takes on the foundational question.</span></div>
+  </div>
+  <div class="lbl" style="margin-top:1.6%">Full annotated list — with DOIs and curated videos — on the module page.</div>
+</div>
+
+
 <aside class="slide-notes print-notes" hidden>
 <h3>Full slide detail</h3><ul>
 <li>Massey et al. (1993) — Theories of International Migration: A Review and Appraisal</li>
@@ -258,15 +917,28 @@
 <li>Carling et al. (2024) — Why Do People Migrate? Fresh Takes on the Foundational Question of Migration Studies</li>
 </ul>
 </aside>
+<div class="segbot"><i class="b"></i><i class="g"></i><i class="o"></i><i class="p"></i></div>
 </section>
-<section class="slide img-slide" id="s17" data-kind="takeaways">
-<h2 class="sr-only">Where we go next</h2>
-<img class="slide-art" src="img/module-01/slide-17.jpg" alt="Where we go next: next module is Migration Data and Global Trends.">
+<section class="slide nslide" id="s17" data-kind="takeaways">
+<div class="segbar"><i class="g"></i><i class="b"></i><i class="o"></i><i class="y"></i><i class="p"></i><i class="sp"></i></div>
+<h2 class="sr-only">Where We Go Next</h2>
 
-<div class="deck-endnav" style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:14px"><a class="nav-btn" href="../modules/module-01.html#quiz" style="text-decoration:none;display:inline-flex;align-items:center">Take the knowledge check</a><a class="nav-btn" href="../modules/module-02.html" style="text-decoration:none;display:inline-flex;align-items:center">Next module: Migration Data and Global Trends →</a></div>
+<div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3%;padding:11% 7% 6%">
+  <h1 class="cover-title" style="font-size:clamp(26px,4.6cqw,56px)">WHERE WE GO NEXT</h1>
+  <svg viewBox="0 0 560 60" aria-hidden="true" style="width:min(52%,480px)">
+    <path d="M10 30 H510" stroke="#073F64" stroke-width="10" stroke-linecap="round"/>
+    <path d="M492 12 L546 30 L492 48" fill="none" stroke="#073F64" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>
+  <p class="cover-sub" style="color:#1FA9A5">Next module: Migration Data and Global Trends</p>
+  <p class="lbl" style="text-align:center;max-width:70ch">Global Migration 101 — part of <i>Refugees &amp; Migrants in Our Common Home</i>, a Villanova University initiative of the Mother Cabrini Institute on Immigration. Verify access and licensing before classroom use.</p>
+</div>
+
+<div style="position:absolute;left:0;right:0;bottom:6%;display:flex;justify-content:center"><div class="deck-endnav" style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:14px"><a class="nav-btn" href="../modules/module-01.html#quiz" style="text-decoration:none;display:inline-flex;align-items:center">Take the knowledge check</a><a class="nav-btn" href="../modules/module-02.html" style="text-decoration:none;display:inline-flex;align-items:center">Next module: Migration Data and Global Trends →</a></div>
+</div>
 <aside class="slide-notes print-notes" hidden>
 <p>No additional notes for this slide.</p>
 </aside>
+<div class="segbot"><i class="b"></i><i class="g"></i><i class="o"></i><i class="p"></i></div>
 </section>
 </main>
 
@@ -282,5 +954,80 @@
 <div class="sr-only" role="status" aria-live="polite" id="announcer"></div>
 <audio id="narrPlayer" preload="none"></audio>
 <script src="../assets/js/deck.js"></script>
+<script>
+/* Native slide engine — narration-synced video-style scenes.
+   Every element with data-t (and optional data-tend) is fully visible in [t, tend).
+   Final state = t→infinity (elements without data-tend). Narration OFF, reduced
+   motion, print, and audio-ended all show the final state. Timings estimated from
+   the word-for-word transcripts — edit data-t/data-tend attributes to fine-tune. */
+(function(){
+  'use strict';
+  var player = document.getElementById('narrPlayer');
+  var narrBtn = document.getElementById('narrToggle');
+  var reduced = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var slides = Array.prototype.slice.call(document.querySelectorAll('.nslide'));
+
+  function applySec(sec, t){
+    sec.querySelectorAll('[data-t]').forEach(function(el){
+      var bt = parseFloat(el.getAttribute('data-t'));
+      var te = el.getAttribute('data-tend');
+      var on = (t === Infinity) ? (te === null) : (t >= bt && (te === null || t < parseFloat(te)));
+      el.classList.toggle('on', on);
+      var hot = el.getAttribute('data-hot');
+      if (hot){ var hr = hot.split('~'); el.classList.toggle('hot', t !== Infinity && t >= parseFloat(hr[0]) && t < parseFloat(hr[1])); }
+    });
+    sec.querySelectorAll('.grow-group').forEach(function(g){
+      g.setAttribute('data-n', g.querySelectorAll('.col.on').length);
+    });
+    sec.querySelectorAll('[data-count]').forEach(function(c){
+      var st = parseFloat(c.getAttribute('data-start'));
+      var target = parseFloat(c.getAttribute('data-count'));
+      var dec = parseInt(c.getAttribute('data-dec')||'0');
+      var frac = (t === Infinity) ? 1 : Math.min(1, Math.max(0,(t-st)/1.4));
+      c.textContent = (target*frac).toFixed(dec) + (c.getAttribute('data-suffix')||'');
+    });
+  }
+  function narrOn(){ return narrBtn && narrBtn.getAttribute('aria-pressed') === 'true'; }
+  function active(){ return document.querySelector('.nslide.active'); }
+
+  // final state everywhere at load
+  slides.forEach(function(s){ applySec(s, Infinity); });
+  if (reduced || !player) return;
+
+  player.addEventListener('timeupdate', function(){
+    var a = active(); if (!a) return;
+    if (narrOn() && a.getAttribute('data-audio') && player.src.indexOf(a.getAttribute('data-audio').replace('audio/','')) !== -1){
+      applySec(a, player.currentTime);
+    }
+  });
+  player.addEventListener('seeked', function(){ var a=active(); if(a && narrOn()) applySec(a, player.currentTime); });
+  player.addEventListener('ended', function(){ var a=active(); if(a) applySec(a, Infinity); });
+  if (narrBtn) narrBtn.addEventListener('click', function(){
+    setTimeout(function(){
+      var a = active(); if (!a) return;
+      applySec(a, narrOn() ? player.currentTime || 0 : Infinity);
+    }, 60);
+  });
+  // when a slide becomes active: start from 0 if narration on, else final state
+  slides.forEach(function(sec){
+    new MutationObserver(function(){
+      if (sec.classList.contains('active')) applySec(sec, narrOn() && sec.getAttribute('data-audio') ? 0 : Infinity);
+    }).observe(sec, {attributes:true, attributeFilter:['class']});
+  });
+  window.__nApply = function(id, t){ var el = document.getElementById(id); if (el) applySec(el, t === -1 ? Infinity : t); };
+  window.addEventListener('beforeprint', function(){ slides.forEach(function(s){ applySec(s, Infinity); }); });
+})();
+</script>
+<script>
+document.querySelectorAll('.pgrid').forEach(function(g){
+  for (var i=0;i<100;i++){
+    var el = document.createElementNS('http://www.w3.org/2000/svg','circle');
+    el.setAttribute('cx', 6+(i%20)*10.6); el.setAttribute('cy', 8+Math.floor(i/20)*17);
+    el.setAttribute('r', 4.2);
+    el.setAttribute('fill', (i===7||i===33||i===61||i===88) ? '#EC7006' : '#B9CFDE');
+    g.appendChild(el);
+  }
+});
+</script>
 </body>
 </html>
