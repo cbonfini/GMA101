@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Perception Gap — Module 2 · Migration Data and Global Trends</title>
+<meta name="description" content="Guess the real numbers behind global migration, then see how your instincts compare with the data. An interactive for Global Migration 101, Module 2.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F6F4EF; --surface:#FCFBF8; --surface-alt:#F0ECE3; --border:#DAD4C8; --border-soft:#E6E1D6;
+  --text:#21201C; --text-muted:#6B675E; --text-faint:#9C988D;
+  --primary:#0E5B62; --primary-700:#0A464C; --primary-300:#5FA0A6; --primary-050:#E4EEEE;
+  --terra:#B0552E; --terra-050:#F6E7DD; --gold:#C58A1A;
+  --mark-actual:#0B94A1; --mark-guess:#B0552E;
+  --font-display:"Source Serif 4",Georgia,"Times New Roman",serif;
+  --font-body:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  --maxw:880px; --radius:14px; --radius-sm:9px;
+  --shadow-sm:0 1px 2px rgba(33,32,28,.05),0 1px 3px rgba(33,32,28,.04);
+  --shadow-md:0 4px 16px rgba(33,32,28,.07),0 2px 6px rgba(33,32,28,.05);
+  --ease:cubic-bezier(.22,.61,.36,1);
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--text);font-family:var(--font-body);font-size:17px;line-height:1.65;-webkit-font-smoothing:antialiased}
+h1,h2,h3{font-family:var(--font-display);font-weight:600;line-height:1.18;letter-spacing:-.01em;margin:0 0 .5em}
+a{color:var(--primary)}
+.nav{background:var(--surface);border-bottom:1px solid var(--border-soft)}
+.nav-inner{max-width:var(--maxw);margin:0 auto;padding:14px 22px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.brand{font-weight:700;color:var(--text);text-decoration:none;font-size:.95rem;display:flex;align-items:center;gap:9px}
+.mark{background:var(--primary);color:#fff;font-family:var(--font-display);border-radius:7px;padding:2px 8px;font-size:.9rem}
+.modtag{margin-left:auto;font-size:.78rem;letter-spacing:.09em;text-transform:uppercase;color:var(--text-muted)}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 22px}
+.band{background:var(--primary);color:#fff}
+.band .wrap{padding:8px 22px;font-size:.8rem;letter-spacing:.1em;text-transform:uppercase;display:flex;gap:14px;flex-wrap:wrap}
+.band b{font-weight:600}
+.band span{opacity:.75}
+main{padding:40px 0 70px}
+.card{background:var(--surface);border:1px solid var(--border-soft);border-radius:var(--radius);box-shadow:var(--shadow-md);padding:34px 36px;margin:0 auto}
+.eyebrow{font-size:.78rem;letter-spacing:.12em;text-transform:uppercase;color:var(--terra);font-weight:600;margin:0 0 10px}
+.lede{color:var(--text-muted);max-width:62ch}
+.btn{display:inline-block;background:var(--primary);color:#fff;border:none;border-radius:999px;padding:12px 26px;font:600 .95rem var(--font-body);cursor:pointer;transition:background .15s var(--ease);text-decoration:none}
+.btn:hover{background:var(--primary-700)}
+.btn.ghost{background:transparent;color:var(--primary);border:1.5px solid var(--primary)}
+.btn.ghost:hover{background:var(--primary-050)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.meta-dots{display:flex;gap:18px;flex-wrap:wrap;margin-top:22px;font-size:.86rem;color:var(--text-muted)}
+.meta-dots span::before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--gold);margin-right:7px;vertical-align:1px}
+.progress{display:flex;gap:6px;margin:0 0 22px}
+.progress i{height:5px;flex:1;border-radius:3px;background:var(--surface-alt);border:1px solid var(--border-soft)}
+.progress i.on{background:var(--terra);border-color:var(--terra)}
+.qnum{font-size:.78rem;letter-spacing:.12em;text-transform:uppercase;color:var(--text-muted);margin:0 0 6px}
+.question{font-size:clamp(1.35rem,3vw,1.8rem)}
+.context{color:var(--text-muted);font-size:.95rem;max-width:60ch}
+.sliderbox{margin:30px 0 8px;padding:24px 26px;background:var(--surface-alt);border:1px solid var(--border-soft);border-radius:var(--radius-sm)}
+.guessval{font-family:var(--font-display);font-size:clamp(1.6rem,4vw,2.3rem);font-weight:700;color:var(--terra);min-height:1.2em}
+.guessval small{font-size:.55em;font-weight:600;color:var(--text-muted)}
+input[type=range]{width:100%;margin:16px 0 4px;accent-color:var(--terra);height:28px;cursor:pointer}
+.range-ends{display:flex;justify-content:space-between;font-size:.8rem;color:var(--text-faint)}
+.hint{font-size:.85rem;color:var(--text-muted);margin-top:8px}
+.actions{margin-top:24px;display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+/* reveal */
+.reveal{margin-top:6px}
+.chart{margin:26px 0 8px}
+.row{margin:0 0 12px}
+.rowlab{font-size:.8rem;letter-spacing:.08em;text-transform:uppercase;font-weight:600;margin-bottom:5px;display:flex;align-items:center;gap:8px}
+.rowlab .sw{width:10px;height:10px;border-radius:3px;display:inline-block}
+.tr{position:relative;height:30px;background:var(--surface-alt);border:1px solid var(--border-soft);border-radius:6px;overflow:hidden}
+.fill{position:absolute;inset:2px auto 2px 2px;width:0;border-radius:4px;transition:width 900ms var(--ease)}
+.fill.guess{background:var(--mark-guess)}
+.fill.actual{background:var(--mark-actual)}
+.vlab{position:absolute;top:50%;transform:translateY(-50%);font:600 .85rem var(--font-body);color:var(--text);white-space:nowrap;padding-left:8px}
+.gapline{font-family:var(--font-display);font-size:1.25rem;margin:18px 0 4px}
+.gapline b{color:var(--terra)}
+.gapline .ok{color:#437A22}
+.why{background:var(--primary-050);border-left:4px solid var(--primary);border-radius:0 var(--radius-sm) var(--radius-sm) 0;padding:16px 20px;margin:18px 0 0;font-size:.95rem}
+.why .src{display:block;margin-top:10px;font-size:.8rem;color:var(--text-muted)}
+/* summary */
+.profile{margin:26px 0}
+.prow{display:grid;grid-template-columns:minmax(120px,220px) 1fr 84px;gap:12px;align-items:center;padding:9px 0;border-bottom:1px solid var(--border-soft);font-size:.86rem}
+.prow:last-child{border-bottom:none}
+.ptrack{position:relative;height:16px}
+.ptrack::before{content:"";position:absolute;left:0;right:0;top:50%;height:2px;background:var(--border);transform:translateY(-50%)}
+.pcenter{position:absolute;top:0;bottom:0;left:50%;width:2px;background:var(--mark-actual)}
+.pdot{position:absolute;top:50%;width:12px;height:12px;border-radius:50%;background:var(--mark-guess);border:2px solid var(--surface);transform:translate(-50%,-50%);box-shadow:var(--shadow-sm)}
+.pmult{text-align:right;font-weight:600;color:var(--text-muted)}
+.legend{display:flex;gap:20px;font-size:.82rem;color:var(--text-muted);margin:8px 0 2px;flex-wrap:wrap}
+.legend i{width:10px;height:10px;border-radius:3px;display:inline-block;margin-right:6px;vertical-align:-1px}
+.takeaway{background:var(--terra-050);border-left:4px solid var(--terra);border-radius:0 var(--radius-sm) var(--radius-sm) 0;padding:18px 22px;margin:24px 0 0}
+footer{border-top:1px solid var(--border-soft);background:var(--surface)}
+footer .wrap{padding:22px;font-size:.83rem;color:var(--text-muted);display:flex;gap:8px 26px;flex-wrap:wrap}
+footer a{color:var(--text-muted)}
+.hidden{display:none !important}
+.classroom .context,.classroom .hint{font-size:1.05rem}
+.classroom .question{font-size:clamp(1.7rem,4vw,2.5rem)}
+.classroom .guessval{font-size:clamp(2.2rem,6vw,3.2rem)}
+@media (max-width:640px){.card{padding:24px 20px}.prow{grid-template-columns:100px 1fr 64px}}
+@media print{.nav,.band,footer,.actions,.progress{display:none}body{background:#fff}.card{box-shadow:none;border:none}}
+@media (prefers-reduced-motion: reduce){.fill{transition:none}}
+</style>
+</head>
+<body>
+<header class="nav"><div class="nav-inner">
+  <a class="brand" href="https://cbonfini.github.io/GMA101/"><span class="mark">GM</span> Global Migration 101</a>
+  <span class="modtag">Module 2 · Migration Data and Global Trends</span>
+</div></header>
+<div class="band"><div class="wrap"><b>The Perception Gap</b><span>What we think we know about migration — versus what the data says</span></div></div>
+
+<main><div class="wrap">
+
+<!-- INTRO -->
+<section class="card" id="intro">
+  <p class="eyebrow">An interactive for Module 2</p>
+  <h1>How good is your gut?</h1>
+  <p class="lede">Before this module hands you the real numbers, find out what your instincts say.
+  Eight questions about the scale, geography and money of global migration. Drag the slider to your
+  honest guess — no grades, no tricks — then see how your answer compares with the best available data.</p>
+  <p class="lede">Research on public opinion finds that most people, in most countries, get these
+  numbers strikingly wrong — usually in the same direction. By the end you'll see your own
+  <em>perception profile</em>: where your instincts run high, where they run low, and why that
+  matters for how migration gets debated.</p>
+  <div class="actions">
+    <button class="btn" id="start">Start guessing</button>
+    <button class="btn ghost" id="classmode">Projector mode</button>
+  </div>
+  <div class="meta-dots"><span>8 questions</span><span>About 10 minutes</span><span>Every answer sourced to UN DESA, UNHCR or the World Bank</span></div>
+</section>
+
+<!-- ROUND -->
+<section class="card hidden" id="round">
+  <div class="progress" id="prog" aria-hidden="true"></div>
+  <p class="qnum" id="qnum"></p>
+  <h2 class="question" id="qtext"></h2>
+  <p class="context" id="qcontext"></p>
+  <div class="sliderbox">
+    <div class="guessval" id="gval" aria-live="polite">Drag the slider</div>
+    <input type="range" id="slider" min="0" max="100" step="1" value="0" aria-labelledby="qtext">
+    <div class="range-ends"><span id="rmin"></span><span id="rmax"></span></div>
+    <p class="hint" id="hint">Drag to answer, then lock it in.</p>
+  </div>
+  <div class="actions"><button class="btn" id="lock" disabled>Lock in my guess</button></div>
+
+  <div class="reveal hidden" id="reveal">
+    <div class="chart" role="img" aria-labelledby="gapline">
+      <div class="legend"><span><i style="background:var(--mark-guess)"></i>Your guess</span><span><i style="background:var(--mark-actual)"></i>The data</span></div>
+      <div class="row"><div class="rowlab"><span class="sw" style="background:var(--mark-guess)"></span>Your guess</div>
+        <div class="tr"><div class="fill guess" id="barGuess"></div><span class="vlab" id="labGuess"></span></div></div>
+      <div class="row"><div class="rowlab"><span class="sw" style="background:var(--mark-actual)"></span>The data</div>
+        <div class="tr"><div class="fill actual" id="barActual"></div><span class="vlab" id="labActual"></span></div></div>
+    </div>
+    <p class="gapline" id="gapline"></p>
+    <div class="why" id="why"></div>
+    <div class="actions"><button class="btn" id="next">Next question</button></div>
+  </div>
+</section>
+
+<!-- SUMMARY -->
+<section class="card hidden" id="summary">
+  <p class="eyebrow">Your results</p>
+  <h1 id="headline"></h1>
+  <p class="lede" id="subline"></p>
+  <div class="profile">
+    <div class="legend"><span><i style="background:var(--mark-guess)"></i>Your guess</span><span><i style="background:var(--mark-actual);border-radius:0;width:3px;height:12px"></i>Reality (1×)</span></div>
+    <div id="prows"></div>
+    <p class="hint">Dots left of the line: you guessed low. Right of the line: you guessed high. The scale is logarithmic — the far edges mean a guess four times (or more) away from the data.</p>
+  </div>
+  <div class="takeaway"><strong>Why this matters.</strong> Migration debates are usually fought with
+  feelings about numbers rather than the numbers themselves — and the gap between the two is where
+  the politics happens. Module 2 is about learning to check the figure, ask who counted it, who was
+  left out of the count, and how the same statistic can be framed as a crisis or a fact of life.
+  Keep your profile in mind as you meet these numbers again in the lecture.</div>
+  <div class="actions">
+    <button class="btn" id="again">Play again</button>
+    <button class="btn ghost" onclick="window.print()">Print / save my results</button>
+    <a class="btn ghost" href="https://cbonfini.github.io/GMA101/modules/module-02.html">Go to Module 2</a>
+  </div>
+</section>
+
+</div></main>
+
+<footer><div class="wrap">
+  <span>Global Migration 101 · Module 2: Migration Data and Global Trends</span>
+  <span>A learning resource from Refugees &amp; Migrants in Our Common Home</span>
+  <a href="perception-gap-teachers.html">Teachers&rsquo; Area</a>
+</div></footer>
+
+<script>
+"use strict";
+var ROUNDS=[
+ {q:"Out of every 100 people on Earth, how many live outside the country they were born in?",
+  context:"Not refugees specifically — everyone counted as an international migrant: workers, students, families, retirees, refugees, all of them together.",
+  min:0,max:50,step:0.5,unit:"out of 100",fmt:function(v){return v+" <small>out of 100</small>"},
+  actual:3.7,actualText:"3.7 out of 100",
+  why:"<strong>3.7% of humanity are international migrants — 304 million people (2024).</strong> It is a very large number of people and a very small share of the world: more than 96% of people live in the country where they were born. Publics in most countries guess this share several times too high.",
+  src:"UN DESA, International Migrant Stock 2024",srcUrl:"https://www.un.org/development/desa/pd/content/international-migrant-stock"},
+ {q:"How many people worldwide were forcibly displaced at the end of 2024?",
+  context:"Refugees, internally displaced people, and asylum seekers combined — everyone forced from home by war, violence or persecution.",
+  min:0,max:400,step:1,unit:"million",fmt:function(v){return v+" <small>million</small>"},
+  actual:123.2,actualText:"123.2 million",
+  why:"<strong>123.2 million people — one in every 67 on Earth.</strong> That includes 42.7 million refugees, 73.5 million people displaced inside their own countries, and 8.4 million asylum seekers. It was the thirteenth consecutive annual increase. Notice which of these groups the word “refugee” usually hides: most displaced people never cross a border.",
+  src:"UNHCR Global Trends 2025 (end-2024)",srcUrl:"https://www.unhcr.org/global-trends"},
+ {q:"What share of the world's refugees are hosted in low- and middle-income countries?",
+  context:"Think about where refugees actually live — not where the loudest policy debates happen.",
+  min:0,max:100,step:1,unit:"%",fmt:function(v){return v+"<small>%</small>"},
+  actual:71,actualText:"71%",
+  why:"<strong>71% of the world's refugees live in low- and middle-income countries.</strong> Colombia alone hosts more than 2.9 million Venezuelans; Uganda, Türkiye, Iran and Pakistan carry far larger shares than most wealthy states. The countries that talk most about refugee burdens host comparatively few.",
+  src:"UNHCR, 2024",srcUrl:"https://www.unhcr.org/global-trends"},
+ {q:"What percentage of Qatar's population are migrants?",
+  context:"Qatar is one of the Gulf states employing migrant workers under the kafala sponsorship system.",
+  min:0,max:100,step:1,unit:"%",fmt:function(v){return v+"<small>%</small>"},
+  actual:88,actualText:"88%",
+  why:"<strong>Migrants are 88% of Qatar's population — and 87% of the UAE's.</strong> The Gulf Cooperation Council states together host roughly 35 million migrant workers. Migration is not a marginal fact everywhere: in some economies it is the population.",
+  src:"Module 2 lecture · GCC / kafala data",srcUrl:"https://www.iom.int/world-migration-report"},
+ {q:"How much money did migrants send home to low- and middle-income countries in 2024?",
+  context:"Officially recorded remittances — the money wired home in ordinary transfers, added up across the year.",
+  min:0,max:1500,step:5,unit:"US$ billion",fmt:function(v){return "$"+v+" <small>billion</small>"},
+  actual:685,actualText:"$685 billion",
+  why:"<strong>$685 billion in 2024 — more than global foreign direct investment to developing countries.</strong> Mexico alone received $66.2 billion in 2023. Remittances are one of the largest development-finance flows on Earth, and among the least discussed.",
+  src:"World Bank / KNOMAD, 2024",srcUrl:"https://www.knomad.org/data/remittances"},
+ {q:"On average, how much does it cost to send $200 home across borders?",
+  context:"Fees plus exchange-rate margin, as a percentage of the amount sent. The UN's SDG target says this should be 3% or less.",
+  min:0,max:25,step:0.1,unit:"%",fmt:function(v){return v+"<small>%</small>"},
+  actual:6.2,actualText:"6.2%",
+  why:"<strong>6.2% on average — $12.40 taken out of every $200 sent (Q4 2023).</strong> That is more than double the 3% Sustainable Development Goal target, and the costs fall hardest on the poorest corridors. Multiply that margin across $685 billion and the stakes become clear.",
+  src:"World Bank, Remittance Prices Worldwide",srcUrl:"https://remittanceprices.worldbank.org"},
+ {q:"In 1990, 2.9 out of every 100 people were international migrants. What is that number today?",
+  context:"The absolute count nearly doubled between 1990 and 2024 — from 154 million to 304 million people. But the world's population grew too.",
+  min:0,max:15,step:0.1,unit:"out of 100",fmt:function(v){return v+" <small>out of 100</small>"},
+  actual:3.7,actualText:"3.7 out of 100",
+  why:"<strong>From 2.9 to 3.7 out of 100 — in thirty-four years.</strong> Headlines describe an age of unprecedented mass migration; as a share of humanity, migration has crept up less than one person in a hundred since 1990. Whether migration is “globalizing” at all is a genuine scholarly debate — and it turns entirely on which measure you pick: stocks, flows, or shares.",
+  src:"UN DESA, International Migrant Stock (1990–2024)",srcUrl:"https://www.un.org/development/desa/pd/content/international-migrant-stock"},
+ {q:"How many displaced children are there worldwide?",
+  context:"A question the data systems answer badly — this is the module's “who gets missed” problem. Give it your best guess anyway.",
+  min:0,max:100,step:1,unit:"million",fmt:function(v){return v+" <small>million</small>"},
+  actual:36,actualText:"≈36 million",
+  why:"<strong>Roughly 36 million — but treat the number with care.</strong> Children are poorly tracked across national systems, and data on unaccompanied and separated children is especially patchy. This round's real lesson: some of the most important migration numbers are estimates with enormous uncertainty, because the people they describe are the hardest for any system to see.",
+  src:"UNICEF estimate, cited in Module 2",srcUrl:"https://data.unicef.org/topic/child-migration-and-displacement/displacement/"}
+];
+
+var i=0, results=[], touched=false;
+var $=function(id){return document.getElementById(id)};
+function show(id){["intro","round","summary"].forEach(function(s){$(s).classList.toggle("hidden",s!==id)})}
+
+function startRound(){
+  var r=ROUNDS[i];
+  $("prog").innerHTML=ROUNDS.map(function(_,k){return "<i"+(k<i?" class='on'":"")+"></i>"}).join("");
+  $("qnum").textContent="Question "+(i+1)+" of "+ROUNDS.length;
+  $("qtext").innerHTML=r.q;
+  $("qcontext").textContent=r.context;
+  var s=$("slider");
+  s.min=r.min;s.max=r.max;s.step=r.step;s.value=r.min;
+  $("rmin").textContent=fmtPlain(r.min,r);$("rmax").textContent=fmtPlain(r.max,r)+" +";
+  $("gval").innerHTML="Drag the slider";
+  $("lock").disabled=true;touched=false;
+  $("reveal").classList.add("hidden");
+  $("lock").parentElement.classList.remove("hidden");
+  $("barGuess").style.width="0";$("barActual").style.width="0";
+  show("round");
+  window.scrollTo({top:0});
+}
+function fmtPlain(v,r){return r.unit==="US$ billion"?"$"+v+"B":(v+(r.unit==="%"?"%":""))}
+
+$("slider").addEventListener("input",function(){
+  touched=true;
+  var r=ROUNDS[i];
+  $("gval").innerHTML=r.fmt(parseFloat(this.value));
+  $("lock").disabled=false;
+});
+
+$("lock").addEventListener("click",function(){
+  if(!touched)return;
+  var r=ROUNDS[i], g=parseFloat($("slider").value);
+  results.push({guess:g,actual:r.actual,label:shortLabel(r)});
+  var mx=Math.max(g,r.actual)*1.1||1;
+  $("lock").parentElement.classList.add("hidden");
+  $("reveal").classList.remove("hidden");
+  $("labGuess").textContent=fmtPlain(g,r);
+  $("labActual").textContent=r.actualText;
+  requestAnimationFrame(function(){requestAnimationFrame(function(){
+    $("barGuess").style.width=Math.max(g/mx*100,0.8)+"%";
+    $("barActual").style.width=Math.max(r.actual/mx*100,0.8)+"%";
+    positionLabel($("labGuess"),g/mx);positionLabel($("labActual"),r.actual/mx);
+  })});
+  $("gapline").innerHTML=gapText(g,r);
+  $("why").innerHTML=r.why+'<span class="src">Source: <a href="'+r.srcUrl+'" target="_blank" rel="noopener">'+r.src+"</a></span>";
+  $("next").textContent=(i===ROUNDS.length-1)?"See my perception profile":"Next question";
+});
+function positionLabel(el,frac){el.style.left="calc("+Math.min(frac*100,78)+"% + 10px)"}
+function gapText(g,r){
+  if(r.actual===0)return "";
+  var ratio=g/r.actual;
+  if(ratio>=0.75&&ratio<=1.33)return '<span class="ok">Close.</span> You guessed '+fmtPlain(g,r)+' — the data says '+r.actualText+'. Better than most publics manage.';
+  if(ratio>1.33)return 'You guessed <b>'+(ratio<10?ratio.toFixed(1):Math.round(ratio))+'× too high</b> — '+fmtPlain(g,r)+' against '+r.actualText+'.';
+  if(g===0)return 'You guessed '+fmtPlain(g,r)+' — the data says <b>'+r.actualText+'</b>.';
+  return 'You guessed <b>'+(1/ratio<10?(1/ratio).toFixed(1):Math.round(1/ratio))+'× too low</b> — '+fmtPlain(g,r)+' against '+r.actualText+'.';
+}
+function shortLabel(r){return r.q.length>52?r.q.slice(0,49).replace(/[ ,]+\S*$/,"")+"…":r.q}
+
+$("next").addEventListener("click",function(){
+  i++;
+  if(i<ROUNDS.length){startRound()}else{summarize()}
+});
+
+function summarize(){
+  var ratios=results.map(function(x){return x.actual?x.guess/x.actual:1});
+  var over=ratios.filter(function(x){return x>1.33}).length;
+  var under=ratios.filter(function(x){return x<0.75}).length;
+  var close=ratios.length-over-under;
+  var logs=ratios.filter(function(x){return x>0}).map(function(x){return Math.abs(Math.log(x))});
+  var geo=logs.length?Math.exp(logs.reduce(function(a,b){return a+b},0)/logs.length):1;
+  $("headline").textContent = close>=5 ? "Your gut is unusually well calibrated."
+    : over>under ? "Your instincts run big — like most people's."
+    : under>over ? "Your instincts run small — an unusual profile."
+    : "Your instincts cut both ways.";
+  $("subline").textContent="On a typical question your guess was about "+geo.toFixed(1)+"× away from the data. "
+    +close+" of your "+ratios.length+" answers landed close (within a third of the real figure), "
+    +over+" ran high and "+under+" ran low. The point isn't the score — it's noticing which numbers felt bigger or smaller than they are, and asking where that feeling came from.";
+  $("prows").innerHTML=results.map(function(x){
+    var ratio=x.actual?x.guess/x.actual:1;
+    var pos=50+Math.max(-1,Math.min(1,Math.log(ratio||0.01)/Math.log(4)))*48;
+    return '<div class="prow"><div>'+x.label+'</div><div class="ptrack"><span class="pcenter"></span><span class="pdot" style="left:'+pos+'%"></span></div><div class="pmult">'+(ratio>=0.75&&ratio<=1.33?"close":ratio>1?(ratio<10?ratio.toFixed(1):Math.round(ratio))+"× high":(x.guess===0?"0":( (1/ratio)<10?(1/ratio).toFixed(1):Math.round(1/ratio))+"× low"))+'</div></div>';
+  }).join("");
+  show("summary");window.scrollTo({top:0});
+}
+
+$("start").addEventListener("click",function(){i=0;results=[];startRound()});
+$("again").addEventListener("click",function(){i=0;results=[];startRound()});
+$("classmode").addEventListener("click",function(){
+  document.body.classList.toggle("classroom");
+  this.textContent=document.body.classList.contains("classroom")?"Exit projector mode":"Projector mode";
+});
+</script>
+</body>
+</html>

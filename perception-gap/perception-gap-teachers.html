@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Teachers&rsquo; Area — The Perception Gap</title>
+<meta name="description" content="Faculty resources for The Perception Gap: run it in class, embed it in your LMS, download the SCORM package, and see the answer map.">
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F6F4EF; --surface:#FCFBF8; --surface-alt:#F0ECE3; --border:#DAD4C8; --border-soft:#E6E1D6;
+  --text:#21201C; --text-muted:#6B675E; --text-faint:#9C988D;
+  --primary:#0E5B62; --primary-700:#0A464C; --primary-050:#E4EEEE;
+  --terra:#B0552E; --terra-050:#F6E7DD; --gold:#C58A1A;
+  --font-display:"Source Serif 4",Georgia,serif; --font-body:"Inter",-apple-system,"Segoe UI",Roboto,sans-serif;
+  --maxw:980px; --radius:14px; --radius-sm:9px;
+  --shadow-sm:0 1px 2px rgba(33,32,28,.05),0 1px 3px rgba(33,32,28,.04);
+  --shadow-md:0 4px 16px rgba(33,32,28,.07),0 2px 6px rgba(33,32,28,.05);
+  --ease:cubic-bezier(.22,.61,.36,1);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:var(--font-body);font-size:17px;line-height:1.65;-webkit-font-smoothing:antialiased}
+main[hidden]{display:none} /* keep gated content hidden until unlocked */
+h1,h2,h3{font-family:var(--font-display);font-weight:600;line-height:1.18;letter-spacing:-.01em;margin:0 0 .5em}
+a{color:var(--primary)}
+.nav{background:var(--surface);border-bottom:1px solid var(--border-soft)}
+.nav-inner{max-width:var(--maxw);margin:0 auto;padding:14px 22px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.brand{font-weight:700;color:var(--text);text-decoration:none;font-size:.95rem;display:flex;align-items:center;gap:9px}
+.mark{background:var(--primary);color:#fff;font-family:var(--font-display);border-radius:7px;padding:2px 8px;font-size:.9rem}
+.navbtns{margin-left:auto;display:flex;gap:10px;flex-wrap:wrap}
+.btn{display:inline-block;background:var(--primary);color:#fff;border:none;border-radius:999px;padding:10px 22px;font:600 .9rem var(--font-body);cursor:pointer;text-decoration:none;transition:background .15s var(--ease)}
+.btn:hover{background:var(--primary-700)}
+.btn.ghost{background:transparent;color:var(--primary);border:1.5px solid var(--primary)}
+.btn.ghost:hover{background:var(--primary-050)}
+.band{background:var(--primary);color:#fff}
+.band .wrap{padding:8px 22px;font-size:.8rem;letter-spacing:.1em;text-transform:uppercase;display:flex;gap:14px;flex-wrap:wrap}
+.band span{opacity:.75}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 22px}
+/* gate */
+.gate{display:flex;justify-content:center;padding:72px 20px 96px}
+.gate-card{width:100%;max-width:460px;background:var(--surface);border:1px solid var(--border-soft);border-radius:var(--radius);padding:36px 32px;box-shadow:var(--shadow-md);text-align:center}
+.gate-card .mark{font-size:1.1rem;padding:6px 12px;display:inline-block;margin-bottom:12px}
+.gate-lede{font-size:.92rem;color:var(--text-muted);margin:0 0 20px}
+.gate-label{display:block;text-align:left;font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted);margin-bottom:6px}
+.gate-row{display:flex;gap:8px}
+.gate-input{flex:1;border:1px solid var(--border);border-radius:999px;padding:10px 16px;font:inherit;background:#fff}
+.gate-err{color:#964219;font-size:.85rem}
+.gate-note{font-size:.8rem;color:var(--text-faint);margin-top:16px}
+/* sections */
+main{padding:46px 0 70px}
+section{margin:0 0 46px}
+.eyebrow{font-size:.78rem;letter-spacing:.12em;text-transform:uppercase;color:var(--terra);font-weight:600;margin:0 0 10px}
+.lede{color:var(--text-muted);max-width:66ch}
+.hero-meta{display:flex;gap:18px;flex-wrap:wrap;margin-top:18px;font-size:.86rem;color:var(--text-muted)}
+.hero-meta span::before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--gold);margin-right:7px;vertical-align:1px}
+.rule{border:none;border-top:2px solid var(--primary);opacity:.25;margin:0 0 46px}
+.embedgen{background:var(--surface);border:1px solid var(--border-soft);border-radius:var(--radius);box-shadow:var(--shadow-sm);padding:22px 24px;margin:20px 0}
+.embedgen-controls{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:14px}
+.embedgen select{font:inherit;padding:8px 12px;border-radius:var(--radius-sm);border:1px solid var(--border);background:#fff}
+.embedgen pre{background:var(--surface-alt);border:1px solid var(--border-soft);border-radius:var(--radius-sm);padding:16px;font-size:.8rem;overflow:auto;margin:0}
+.copied{color:#437A22;font-size:.85rem;font-weight:600}
+.lms{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px;margin:20px 0}
+.lms-card{background:var(--surface);border:1px solid var(--border-soft);border-radius:var(--radius-sm);padding:16px 18px;font-size:.88rem}
+.lms-card h3{font-size:1rem;margin-bottom:.4em}
+.lms-card ol{margin:0;padding-left:18px}
+.callout{background:var(--primary-050);border-left:4px solid var(--primary);border-radius:0 var(--radius-sm) var(--radius-sm) 0;padding:16px 20px;font-size:.93rem}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;margin:20px 0}
+.dcard{background:var(--surface);border:1px solid var(--border-soft);border-radius:var(--radius);box-shadow:var(--shadow-sm);padding:20px 22px;text-decoration:none;color:var(--text);display:flex;flex-direction:column;gap:6px;transition:box-shadow .15s var(--ease)}
+.dcard:hover{box-shadow:var(--shadow-md)}
+.kicker{font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--text-muted);font-weight:600}
+.dcard h3{margin:0;font-size:1.1rem}
+.dcard p{margin:0;font-size:.88rem;color:var(--text-muted)}
+.cta{margin-top:auto;padding-top:8px;color:var(--primary);font-weight:600;font-size:.88rem}
+.twocol{display:grid;grid-template-columns:1fr 1fr;gap:34px}
+@media (max-width:760px){.twocol{grid-template-columns:1fr}}
+.sub{font-size:1.05rem;margin:1.2em 0 .4em}
+.spoiler{background:var(--gold);color:#fff;font-size:.68rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;border-radius:999px;padding:2px 10px;vertical-align:2px}
+table{border-collapse:collapse;width:100%;font-size:.88rem;margin:14px 0}
+th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--border-soft);vertical-align:top}
+th{font-size:.72rem;letter-spacing:.09em;text-transform:uppercase;color:var(--text-muted)}
+td b{color:var(--primary-700)}
+.qlist{margin:0;padding-left:20px}
+.qlist li{margin-bottom:.55em}
+footer{border-top:1px solid var(--border-soft);background:var(--surface)}
+footer .wrap{padding:22px;font-size:.83rem;color:var(--text-muted);display:flex;gap:8px 26px;flex-wrap:wrap}
+</style>
+</head>
+<body>
+<header class="nav"><div class="nav-inner">
+  <a class="brand" href="https://cbonfini.github.io/GMA101/"><span class="mark">GM</span> Global Migration 101</a>
+  <div class="navbtns">
+    <a class="btn ghost" href="https://cbonfini.github.io/GMA101/modules/module-02.html">Module 2</a>
+    <a class="btn" href="perception-gap.html">Open the game</a>
+  </div>
+</div></header>
+<div class="band"><div class="wrap"><b>Teachers&rsquo; Area</b><span>The Perception Gap · Module 2 · Migration Data and Global Trends</span></div></div>
+
+<!-- PASSCODE GATE -->
+<div class="gate" id="gate">
+  <form class="gate-card" id="gate-form">
+    <span class="mark">GM</span>
+    <h1 style="font-size:1.5rem">Teachers&rsquo; Area</h1>
+    <p class="gate-lede">This area contains facilitator materials, embed codes, and the answer map
+    with all eight figures — spoilers for the game. Enter the faculty passcode to continue.</p>
+    <label class="gate-label" for="gate-code">Passcode</label>
+    <div class="gate-row">
+      <input class="gate-input" id="gate-code" type="password" autocomplete="off" placeholder="Enter passcode" required>
+      <button class="btn" type="submit">Enter</button>
+    </div>
+    <p class="gate-err" id="gate-error" hidden>That passcode isn&rsquo;t right. Please check with your program contact.</p>
+    <p class="gate-note">Don&rsquo;t have the passcode? Contact your Refugees &amp; Migrants in Our Common Home program coordinator.</p>
+  </form>
+</div>
+
+<!-- GATED CONTENT -->
+<main id="teachers-content" hidden><div class="wrap">
+
+<section>
+  <p class="eyebrow">For Faculty &amp; Facilitators</p>
+  <h1>Run the Perception Gap in your course</h1>
+  <p class="lede">Everything you need to teach with the game: two ways to run it, a copy-paste
+  embed code for your LMS, a SCORM package for gradebook tracking, tiered discussion questions,
+  and the full answer map. Every figure in the game comes from the Module 2 lecture and is cited
+  to UN DESA, UNHCR, or the World Bank.</p>
+  <div class="hero-meta"><span>~10 min solo play</span><span>15&ndash;20 min as a live class opener</span><span>8 questions · all sourced</span></div>
+</section>
+
+<hr class="rule">
+
+<section id="embed">
+  <p class="eyebrow">Embed</p>
+  <h2>Embed the game in your course</h2>
+  <p class="lede">Copy the code below and paste it wherever your LMS accepts HTML. The game is a
+  single self-contained page — no accounts, no tracking, nothing stored.</p>
+  <div class="embedgen">
+    <div class="embedgen-controls">
+      <label for="embed-height" style="font-size:.8rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted)">Frame height</label>
+      <select id="embed-height">
+        <option value="700">700 px — compact</option>
+        <option value="850" selected>850 px — recommended</option>
+        <option value="1000">1000 px — roomy</option>
+      </select>
+      <button class="btn" id="copy-embed" type="button">Copy embed code</button>
+      <span class="copied" id="copy-confirm" role="status" hidden>Copied ✓</span>
+    </div>
+    <pre id="embed-code" aria-label="Embed code"></pre>
+    <p id="embed-note" hidden style="font-size:.83rem;color:var(--text-muted);margin:10px 0 0"><strong>Note:</strong> you are viewing this page from a local file, so the code above shows a file path. Once the game is hosted on the web, this page will generate the correct public URL automatically.</p>
+  </div>
+  <div class="lms">
+    <div class="lms-card"><h3>Canvas</h3><ol><li>Open a Page and click <strong>Edit</strong>.</li><li>Choose the <strong>&lt;/&gt;</strong> (HTML) view.</li><li>Paste and <strong>Save</strong>.</li></ol></div>
+    <div class="lms-card"><h3>Moodle</h3><ol><li>Add a <strong>Page</strong> resource.</li><li>Click the <strong>HTML</strong> (&lt;/&gt;) button.</li><li>Paste and save.</li></ol></div>
+    <div class="lms-card"><h3>Blackboard</h3><ol><li>Create an <strong>Item</strong>.</li><li>Open the <strong>source code</strong> view.</li><li>Paste and submit.</li></ol></div>
+    <div class="lms-card"><h3>Brightspace</h3><ol><li>Create an HTML content item.</li><li>Toggle to <strong>HTML source</strong>.</li><li>Paste and publish.</li></ol></div>
+  </div>
+  <aside class="callout"><strong>Which delivery method?</strong> The iframe embed is the fastest
+  path and works in any LMS content page, but does not report to your gradebook. If you need a
+  completion mark, upload the <a href="downloads/perception-gap-scorm12.zip" download>SCORM 1.2
+  package</a> instead — it registers the game as complete when a student opens it, so pair it with
+  the reflection prompt below as the graded artifact. Or simply
+  <a href="perception-gap.html" target="_blank" rel="noopener">link to the full page</a>.</aside>
+</section>
+
+<hr class="rule">
+
+<section id="resources">
+  <p class="eyebrow">Resources</p>
+  <h2>Materials</h2>
+  <div class="cards">
+    <a class="dcard" href="perception-gap.html" target="_blank" rel="noopener">
+      <span class="kicker">Interactive · opens in a new tab</span><h3>The Perception Gap</h3>
+      <p>The student-facing game. Use “Projector mode” (on the intro screen) for larger type when running it live.</p>
+      <span class="cta">Open the game →</span></a>
+    <a class="dcard" href="downloads/perception-gap-scorm12.zip" download>
+      <span class="kicker">SCORM 1.2 · LMS-ready</span><h3>SCORM Package</h3>
+      <p>Upload to Canvas, Moodle, Blackboard, Brightspace, or LearnWorlds. Reports completion on launch.</p>
+      <span class="cta">Download ZIP ↓</span></a>
+    <a class="dcard" href="https://cbonfini.github.io/GMA101/modules/module-02.html">
+      <span class="kicker">Module 2 · course hub</span><h3>Migration Data and Global Trends</h3>
+      <p>The full module the game belongs to: narrated lecture, readings, assignments and the signature data-brief experience.</p>
+      <span class="cta">Open Module 2 →</span></a>
+  </div>
+</section>
+
+<hr class="rule">
+
+<section id="notes">
+  <p class="eyebrow">Teaching Notes</p>
+  <h2>Before you teach it</h2>
+  <div class="twocol">
+    <div>
+      <h3 class="sub">Two ways to run it</h3>
+      <p><strong>As pre-work (recommended).</strong> Assign the game before the Module 2 session
+      (~10 minutes) with a one-line reflection: <em>“Which answer surprised you most, and where do
+      you think your instinct came from?”</em> Open class by collecting surprises — the discussion
+      usually starts itself.</p>
+      <p><strong>Live, as a class opener (15–20 min).</strong> Project the game in Projector mode.
+      For each question, have students vote by show of hands, phone poll, or shouted guesses; enter
+      the room's consensus on the slider and lock it in together. The reveal lands hardest when the
+      class has publicly committed to a number first.</p>
+      <h3 class="sub">Care note</h3>
+      <p>Some students are migrants, or children of migrants, and round 8 concerns displaced
+      children. Keep individual guesses private in the solo version (don't ask students to share
+      scores), and frame gaps as <em>everyone's</em> gaps — the research shows systematic
+      misperception across whole publics, not individual ignorance.</p>
+    </div>
+    <div>
+      <h3 class="sub">Discussion questions</h3>
+      <p style="font-size:.85rem;color:var(--text-muted)">Tiered, matching the module's discussion format.</p>
+      <ol class="qlist" style="font-size:.92rem">
+        <li><strong>Describe:</strong> Which of your guesses was furthest from the data? Was the class's direction (high/low) consistent?</li>
+        <li><strong>Describe:</strong> Which number do you think you had encountered before, and where?</li>
+        <li><strong>Analyze:</strong> Why do publics systematically overestimate the share of migrants — what supplies the mental images the guesses come from?</li>
+        <li><strong>Analyze:</strong> Round 7 shows the migrant share rose only from 2.9% to 3.7% since 1990. Why does “an age of unprecedented mass migration” still feel true?</li>
+        <li><strong>Analyze:</strong> Round 8's answer is an estimate with huge uncertainty. Who benefits, and who is harmed, when a number is missing?</li>
+        <li><strong>Evaluate:</strong> The lecture's Brexit case shows the same statistic framed as crisis or fact. Pick one game figure and write both frames for it.</li>
+        <li><strong>Evaluate:</strong> If perception gaps are this systematic, what obligations do journalists, politicians — and professors — have when they quote migration numbers?</li>
+      </ol>
+    </div>
+  </div>
+
+  <h3 class="sub" style="margin-top:1.8em">Answer map <span class="spoiler">Spoilers</span></h3>
+  <table>
+    <thead><tr><th>#</th><th>Question</th><th>Answer</th><th>Source</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td>Share of world population who are international migrants</td><td><b>3.7 in 100</b> (304 million, 2024)</td><td>UN DESA, International Migrant Stock 2024</td></tr>
+      <tr><td>2</td><td>Forcibly displaced worldwide, end-2024</td><td><b>123.2 million</b> — 1 in 67 people (42.7M refugees · 73.5M IDPs · 8.4M asylum seekers)</td><td>UNHCR Global Trends 2025</td></tr>
+      <tr><td>3</td><td>Share of refugees hosted in low- &amp; middle-income countries</td><td><b>71%</b></td><td>UNHCR, 2024</td></tr>
+      <tr><td>4</td><td>Migrant share of Qatar's population</td><td><b>88%</b> (UAE 87%; ~35M workers across the GCC)</td><td>Module 2 lecture · GCC/kafala data</td></tr>
+      <tr><td>5</td><td>Remittances to low- &amp; middle-income countries, 2024</td><td><b>$685 billion</b> — more than FDI to developing countries; Mexico $66.2B (2023)</td><td>World Bank / KNOMAD</td></tr>
+      <tr><td>6</td><td>Average cost of sending $200</td><td><b>6.2%</b> ($12.40; SDG target 3%) — Q4 2023</td><td>World Bank, Remittance Prices Worldwide</td></tr>
+      <tr><td>7</td><td>Migrant share of world population, 1990 → 2024</td><td><b>2.9 → 3.7 in 100</b> (154M → 304M)</td><td>UN DESA</td></tr>
+      <tr><td>8</td><td>Displaced children worldwide</td><td><b>≈36 million</b> — an estimate with wide uncertainty; the “who gets missed” round</td><td>UNICEF, cited in Module 2</td></tr>
+    </tbody>
+  </table>
+  <p style="font-size:.85rem;color:var(--text-muted)">Figures match the Module 2 narrated lecture
+  (June 2025 data vintage: UN DESA 2024 edition, UNHCR Global Trends 2025, World Bank 2024).
+  When the lecture's figures are updated, update the game's ROUNDS array — each question, answer
+  and source lives in one block at the top of the game file's script.</p>
+</section>
+
+</div></main>
+
+<footer><div class="wrap">
+  <span>Global Migration 101 · Module 2</span>
+  <span>A learning resource from Refugees &amp; Migrants in Our Common Home · <a href="https://migrationandacademia.org" target="_blank" rel="noopener">migrationandacademia.org</a></span>
+</div></footer>
+
+<script>
+/* Passcode gate — same passcode and mechanism as the programme's other Teachers' Areas.
+   To change the passcode: hash the new code with SHA-256 and replace PASS_HASH. */
+const PASS_HASH="b69e3e725c69e9328ee7271f788b3aeceb15ce0fa81c15fcb172b0899281159b";
+const SESSION_KEY="gm101-teachers-unlocked";
+const gate=document.getElementById("gate"),content=document.getElementById("teachers-content"),
+      form=document.getElementById("gate-form"),input=document.getElementById("gate-code"),
+      errorEl=document.getElementById("gate-error");
+async function sha256Hex(t){const d=new TextEncoder().encode(t);const b=await crypto.subtle.digest("SHA-256",d);
+  return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,"0")).join("")}
+async function checkCode(c){const n=c.trim().toLowerCase();
+  if(window.crypto&&crypto.subtle){return await sha256Hex(n)===PASS_HASH}
+  return n==="commonhome2026"}
+function unlock(){gate.remove();content.hidden=false;buildEmbedCode()}
+if(sessionStorage.getItem(SESSION_KEY)==="1"){unlock()}
+else{form.addEventListener("submit",async e=>{e.preventDefault();
+  if(await checkCode(input.value)){try{sessionStorage.setItem(SESSION_KEY,"1")}catch(_){}unlock()}
+  else{errorEl.hidden=false;input.select()}})}
+
+function embedUrl(){return new URL("perception-gap.html",window.location.href).href}
+function snippet(h){return ['<iframe','  src="'+embedUrl()+'"','  title="The Perception Gap — Module 2 interactive"','  width="100%" height="'+h+'"','  style="border: 1px solid #DAD4C8; border-radius: 10px;"','  allowfullscreen loading="lazy"></iframe>'].join("\n")}
+function buildEmbedCode(){
+  const codeEl=document.getElementById("embed-code"),sel=document.getElementById("embed-height"),
+        btn=document.getElementById("copy-embed"),ok=document.getElementById("copy-confirm"),
+        note=document.getElementById("embed-note");
+  const render=()=>{codeEl.textContent=snippet(sel.value)};render();
+  sel.addEventListener("change",render);
+  if(window.location.protocol==="file:")note.hidden=false;
+  btn.addEventListener("click",async()=>{const t=codeEl.textContent;let c=false;
+    try{await navigator.clipboard.writeText(t);c=true}
+    catch(_){const ta=document.createElement("textarea");ta.value=t;document.body.appendChild(ta);ta.select();
+      try{c=document.execCommand("copy")}catch(_2){}ta.remove()}
+    if(c){ok.hidden=false;setTimeout(()=>{ok.hidden=true},2000)}});
+}
+</script>
+</body>
+</html>
